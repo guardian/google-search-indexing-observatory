@@ -1,0 +1,17 @@
+stacks:
+- ophan
+deployments:
+  geoip-db-refresher:
+    type: aws-lambda
+    parameters:
+      bucket: ophan-dist
+      fileName: geoip-db-refresher.jar
+      lookupByTags: true
+  cloudformation:
+    type: cloud-formation
+    app: geoip-db-refresher
+    dependencies: [ geoip-db-refresher ]
+    parameters:
+      templatePath: cfn.yaml
+regions:
+- eu-west-1
