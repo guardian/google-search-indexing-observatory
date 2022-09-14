@@ -2,6 +2,7 @@ package ophan.google.index.checker
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
+import com.gu.contentapi.client.GuardianContentClient
 import ophan.google.index.checker.logging.Logging
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
@@ -14,7 +15,7 @@ object Lambda extends Logging {
    * Logic handler
    */
   def go(): Unit = {
-
+    val client = new GuardianContentClient("your-api-key")
   }
 
   // See https://docs.aws.amazon.com/AmazonS3/latest/userguide/finding-canonical-user-id.html

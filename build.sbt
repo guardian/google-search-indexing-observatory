@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
 
   "com.lihaoyi" %% "upickle" % "1.6.0",
   "com.google.guava" % "guava" % "31.1-jre",
+  ("com.gu" %% "content-api-client-default" % "19.0.4").cross(CrossVersion.for3Use2_13),
 
 ) ++ Seq("ssm", "s3", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
 
@@ -39,7 +40,6 @@ assembly / assemblyMergeStrategy := {
   case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
   case _ => MergeStrategy.first
 }
-
 
 buildInfoPackage := "ophan.google.index.checker"
 buildInfoKeys := {

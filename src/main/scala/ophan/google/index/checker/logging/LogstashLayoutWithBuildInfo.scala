@@ -3,7 +3,7 @@ package ophan.google.index.checker.logging
 import ch.qos.logback.classic.spi.ILoggingEvent
 import com.amazonaws.services.lambda.runtime.LambdaRuntimeInternal
 import net.logstash.logback.layout.LogstashLayout
-import ophan.geoip.extractor.BuildInfo
+import ophan.google.index.checker.BuildInfo
 import upickle.default._
 
 object UniqueIdForVM {
