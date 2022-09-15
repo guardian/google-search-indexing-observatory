@@ -8,7 +8,7 @@ description:= "Checking whether Guardian content is available in google search"
 
 version := "1.0"
 
-scalaVersion := "3.1.3"
+scalaVersion := "2.13.8"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -24,7 +24,10 @@ libraryDependencies ++= Seq(
 
   "com.lihaoyi" %% "upickle" % "1.6.0",
   "com.google.guava" % "guava" % "31.1-jre",
+  "com.google.http-client" % "google-http-client-gson" % "1.42.2",
+  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   ("com.gu" %% "content-api-client-default" % "19.0.4").cross(CrossVersion.for3Use2_13),
+  "org.scalatest" %% "scalatest" % "3.2.12" % Test
 
 ) ++ Seq("ssm", "s3", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
 
