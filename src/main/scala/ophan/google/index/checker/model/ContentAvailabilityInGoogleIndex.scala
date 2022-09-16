@@ -14,9 +14,5 @@ case class ContentAvailabilityInGoogleIndex(
     contentWasAbsentFromGoogleAtLatestCheck && contentSummary.timeSinceUrlWentPublic() > gracePeriod
   }
 
-  val contentWasAbsentFromGoogleAtLatestCheck = {
-    val bool = indexPresenceByTime.lastOption.exists(_._2 == false)
-    println(bool+" "+indexPresenceByTime)
-    bool
-  }
+  val contentWasAbsentFromGoogleAtLatestCheck = indexPresenceByTime.lastOption.exists(_._2 == false)
 }

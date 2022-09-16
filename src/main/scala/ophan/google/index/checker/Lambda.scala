@@ -27,17 +27,17 @@ import scala.concurrent.duration._
 
 object Lambda extends Logging {
 
-  val recentContentService = {
-    val capiKey: String = fetchKeyFromParamaterStore("/Ophan/dashboard-es7/CODE/ContentApiKey")
+  val recentContentService: RecentContentService = {
+    val capiKey: String = fetchKeyFromParameterStore("/Ophan/dashboard-es7/CODE/ContentApiKey")
     new RecentContentService(new GuardianContentClient(capiKey))
   }
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParamaterStore("/Ophan/Google/CustomSearch/ApiKey")
+    val apiKey = fetchKeyFromParameterStore("/Ophan/Google/CustomSearch/ApiKey")
     new GoogleSearchService(apiKey)
   }
 
-  private def fetchKeyFromParamaterStore(value: String): String =
+  private def fetchKeyFromParameterStore(value: String): String =
     AWS.SSM.getParameter(_.withDecryption(true).name(value)).parameter.value
 
   /*
@@ -48,12 +48,13 @@ object Lambda extends Logging {
       contentSummaries <- recentContentService.fetchRecentContent()
       allAvailability <- Future.traverse(contentSummaries)(googleSearchService.contentAvailabilityInGoogleIndex)
     } yield {
+      val successfulIndexStateChecks = allAvailability.count(_.indexPresenceByTime.nonEmpty)
+      println(s"Search Index checks: $successfulIndexStateChecks/${contentSummaries.size} accessed Google's API without error")
       for {
         worryinglyAbsentContent <- allAvailability.filter(_.contentIsCurrentlyWorryinglyAbsentFromGoogle())
       } {
         val content = worryinglyAbsentContent.contentSummary
-        println(content.timeSinceUrlWentPublic() + " " + content.googleSearchUiUrl + " " + worryinglyAbsentContent.contentIsCurrentlyWorryinglyAbsentFromGoogle())
-        println(s"${content.ophanUrl}\n\n")
+        println(s"${content.timeSinceUrlWentPublic().toMinutes}mins ${content.ophanUrl}\n${content.googleSearchUiUrl}\n")
       }
       allAvailability
     }

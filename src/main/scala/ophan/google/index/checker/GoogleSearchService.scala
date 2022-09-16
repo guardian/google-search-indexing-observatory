@@ -1,5 +1,6 @@
 package ophan.google.index.checker
 
+import com.google.api.client.http.{HttpRequest, HttpRequestInitializer}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.customsearch.v1.CustomSearchAPI
@@ -12,6 +13,7 @@ import java.time.Instant
 import scala.collection.immutable.SortedMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 class GoogleSearchService(
   apiKey: String
@@ -22,19 +24,32 @@ class GoogleSearchService(
     new CustomSearchAPI.Builder(
       new NetHttpTransport,
       new GsonFactory,
-      null
-    ).setApplicationName("index-checker").build()
+      new HttpRequestInitializer {
+        override def initialize(request: HttpRequest): Unit = {
+          request.getHeaders.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
+
+        }
+      }
+    ).setApplicationName("flung").build()
 
 
   def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[ContentAvailabilityInGoogleIndex] = Future {
-    val googleSearchResponse: Search = search.cse.siterestrict.list()
+    val listRequest = search.cse.list()
       .setKey(apiKey)
       .setCx("415ef252844d240a7")
       .setQ(content.reliableSearchTerm)
-      .execute()
+    val checkResult: SortedMap[Instant, Boolean] = Try(listRequest.execute()).map { googleSearchResponse =>
+      val matchingGoogleResult = findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl)
+      val found = matchingGoogleResult.isDefined
+      if (!found) {
+        println(content.webUrl)
+        println(listRequest.buildHttpRequestUrl().build())
+      }
+      SortedMap(Instant.now -> found)
+    }.getOrElse(SortedMap.empty)
 
-    val matchingGoogleResult = findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl)
-    ContentAvailabilityInGoogleIndex(content, SortedMap(Instant.now -> matchingGoogleResult.isDefined))
+
+    ContentAvailabilityInGoogleIndex(content, checkResult)
   }
 
 

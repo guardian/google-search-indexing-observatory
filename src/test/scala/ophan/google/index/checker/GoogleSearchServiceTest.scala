@@ -12,7 +12,9 @@ class GoogleSearchServiceTest extends AnyFlatSpec with Matchers {
       "https://www.theguardian.com/food/2022/sep/15/korean-hotdogs-k-dogs-sausage-cheese-fast-food?utm_term=Autofeed&CMP=twt_gu&utm_medium&utm_source=Twitter"
 
     val canonicalPageUrl = URI.create("https://www.theguardian.com/food/2022/sep/15/korean-hotdogs-k-dogs-sausage-cheese-fast-food")
-    val result = new Result().setLink(googleResultLink)
-    GoogleSearchService.resultMatches(canonicalPageUrl, result) shouldBe true
+    GoogleSearchService.resultMatches(canonicalPageUrl, resultWithLink(googleResultLink)) shouldBe true
   }
+
+
+  private def resultWithLink(googleResultLink: String) = new Result().setLink(googleResultLink)
 }

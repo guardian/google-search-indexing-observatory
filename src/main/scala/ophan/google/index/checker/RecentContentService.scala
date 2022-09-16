@@ -4,6 +4,9 @@ import com.gu.contentapi.client.model.SearchQuery
 import com.gu.contentapi.client.{ContentApiClient, GuardianContentClient}
 import ophan.google.index.checker.model.ContentSummary
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.HOURS
 import scala.concurrent.{ExecutionContext, Future}
 
 class RecentContentService(
@@ -15,10 +18,14 @@ class RecentContentService(
   val query: SearchQuery = ContentApiClient.search
     .orderBy("newest").useDate("first-publication")
     .showFields("firstPublicationDate")
+    .fromDate(Some(Instant.now().minus(4, HOURS)))
+    // .q("charles")
     .pageSize(50)
   
-  def fetchRecentContent(): Future[Seq[ContentSummary]] = client.getResponse(query) map {
-    _.results.toSeq.flatMap(ContentSummary.from)
+  def fetchRecentContent(): Future[Seq[ContentSummary]] = client.getResponse(query) map { resp =>
+    val results = resp.results.toSeq
+    println(s"Found ${results.size}")
+    results.flatMap(ContentSummary.from)
   }
 
 }
