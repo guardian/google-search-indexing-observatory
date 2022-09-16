@@ -27,7 +27,7 @@ class GoogleSearchService(
 
 
   def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[ContentAvailabilityInGoogleIndex] = Future {
-    val googleSearchResponse: Search = search.cse().list()
+    val googleSearchResponse: Search = search.cse.siterestrict.list()
       .setKey(apiKey)
       .setCx("415ef252844d240a7")
       .setQ(content.reliableSearchTerm)
