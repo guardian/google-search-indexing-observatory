@@ -30,9 +30,9 @@ class GoogleSearchService(
     ).setApplicationName("search-index-checker").build()
 
   def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[CheckReport] = Future { blocking {
-      val listRequest = search.cse.list()
+      val listRequest = search.cse.siterestrict.list()
         .setKey(apiKey)
-        .setCx("415ef252844d240a7")
+        .setCx("415ef252844d240a7") // see https://programmablesearchengine.google.com/controlpanel/all
         .setQ(content.reliableSearchTerm)
       CheckReport(Instant.now, accessGoogleIndex = Try(listRequest.execute()).map { googleSearchResponse =>
         findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl).isDefined
