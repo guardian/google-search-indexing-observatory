@@ -20,7 +20,7 @@ class RecentContentService(
     .showFields("firstPublicationDate")
     .fromDate(Some(Instant.now().minus(4, HOURS)))
     // .q("charles")
-    .pageSize(50)
+    .pageSize(100)
   
   def fetchRecentContent(): Future[Seq[ContentSummary]] = client.getResponse(query) map { resp =>
     val results = resp.results.toSeq
