@@ -41,10 +41,10 @@ class GoogleSearchService(
     val checkResult: SortedMap[Instant, Boolean] = Try(listRequest.execute()).map { googleSearchResponse =>
       val matchingGoogleResult = findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl)
       val found = matchingGoogleResult.isDefined
-      if (!found) {
-        println(content.webUrl)
-        println(listRequest.buildHttpRequestUrl().build())
-      }
+//      if (!found) {
+//        println(content.webUrl)
+//        println(listRequest.buildHttpRequestUrl().build())
+//      }
       SortedMap(Instant.now -> found)
     }.getOrElse(SortedMap.empty)
 

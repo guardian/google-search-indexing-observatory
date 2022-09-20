@@ -1,16 +1,16 @@
 stacks:
 - ophan
 deployments:
-  geoip-db-refresher:
+  google-search-index-checker:
     type: aws-lambda
     parameters:
       bucket: ophan-dist
-      fileName: geoip-db-refresher.jar
+      fileName: google-search-index-checker.jar
       lookupByTags: true
   cloudformation:
     type: cloud-formation
-    app: geoip-db-refresher
-    dependencies: [ geoip-db-refresher ]
+    app: google-search-index-checker
+    dependencies: [ google-search-index-checker ]
     parameters:
       templatePath: cfn.yaml
 regions:

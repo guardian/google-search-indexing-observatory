@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  isPrFromForkedRepo: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.owner.login != 'guardian' }}
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+
+    # Required by aws-actions/configure-aws-credentials
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Restore and save dependency cache
+        uses: coursier/cache-action@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: adopt
+
+      - name: Test PR from forked repo
+        if: env.isPrFromForkedRepo == 'true'
+        run: sbt test
+
+        # Required by SBT riffRaffUpload
+      - name: Assume AWS role
+        if: env.isPrFromForkedRepo == 'false'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Upload artefacts to Riffraff
+        if: env.isPrFromForkedRepo == 'false'
+        run: >
+          sbt
+          riffRaffUpload

@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Fetching the latest GeoIP database and putting it in S3 for Ophan
+Description: Checking whether Guardian content is available in google search
 Parameters:
   App:
     Description: Application name
     Type: String
-    Default: geoip-db-refresher
+    Default: google-search-index-checker
 Resources:
   ExecutionRole:
     Type: AWS::IAM::Role
@@ -27,12 +27,9 @@ Resources:
                 - logs:CreateLogStream
                 - logs:PutLogEvents
               Resource: arn:aws:logs:*:*:*
-        - PolicyName: ophan-geoip-db-refresher-actions
+        - PolicyName: ophan-google-search-index-checker-actions
           PolicyDocument:
             Statement:
-            - Effect: Allow
-              Action: [s3:PutObject, s3:PutObjectAcl]
-              Resource: arn:aws:s3:::ophan-dist/geoip/*
             - Effect: Allow
               Action: ssm:GetParameter
               Resource: 'arn:aws:ssm:eu-west-1:021353022223:parameter/Ophan/GeoIP'
@@ -45,9 +42,9 @@ Resources:
     Properties:
       Code:
         S3Bucket: ophan-dist
-        S3Key: ophan/PROD/geoip-db-refresher/geoip-db-refresher.jar
-      Description: Fetching the latest GeoIP database and putting it in S3 for Ophan
-      Handler: ophan.geoip.db.refresher.Lambda::handler
+        S3Key: ophan/PROD/google-search-index-checker/google-search-index-checker.jar
+      Description: Checking whether Guardian content is available in google search
+      Handler: ophan.google.index.checker.Lambda::handler
       MemorySize: 1536 # more memory than we need, but we're billed for fewer GB-seconds this way
       Role: !GetAtt ExecutionRole.Arn
       Runtime: java11
@@ -58,11 +55,10 @@ Resources:
   ScheduledRule:
     Type: AWS::Events::Rule
     Properties:
-      # MaxMind: "Databases updated twice weekly on Tuesdays and Fridays" ... can be "delayed by about one day"
-      ScheduleExpression: cron(20 11 ? * WED,THU,SAT,SUN *)
+      ScheduleExpression: rate(1 hour)
       Targets:
       - Arn: !GetAtt [Lambda, Arn]
-        Id: GeoIPRefresherLambda
+        Id: GoogleSearchIndexCheckerLambda
 
   # Permission to allow the event rule to trigger the lambda
   InvokeLambdaPermission:

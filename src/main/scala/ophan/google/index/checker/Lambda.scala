@@ -50,8 +50,10 @@ object Lambda extends Logging {
     } yield {
       val successfulIndexStateChecks = allAvailability.count(_.indexPresenceByTime.nonEmpty)
       println(s"Search Index checks: $successfulIndexStateChecks/${contentSummaries.size} accessed Google's API without error")
+      val allWorryinglyAbsentContent = allAvailability.filter(_.contentIsCurrentlyWorryinglyAbsentFromGoogle())
+      println(f"Missing from Google index: ${100f*allWorryinglyAbsentContent.size/successfulIndexStateChecks}%.1f%%")
       for {
-        worryinglyAbsentContent <- allAvailability.filter(_.contentIsCurrentlyWorryinglyAbsentFromGoogle())
+        worryinglyAbsentContent <- allWorryinglyAbsentContent
       } {
         val content = worryinglyAbsentContent.contentSummary
         println(s"${content.timeSinceUrlWentPublic().toMinutes}mins ${content.ophanUrl}\n${content.googleSearchUiUrl}\n")
