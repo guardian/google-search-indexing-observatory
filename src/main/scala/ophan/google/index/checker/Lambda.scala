@@ -62,7 +62,7 @@ object Lambda extends Logging {
       val allWorryinglyAbsentContent = availability.values.filter(_.contentIsCurrentlyWorryinglyAbsentFromGoogle())
       //println(f"Missing from Google index: ${100f*allWorryinglyAbsentContent.size/successfulIndexStateChecks}%.1f%%")
       for {
-        worryinglyAbsentContent <- allWorryinglyAbsentContent
+        worryinglyAbsentContent <- allWorryinglyAbsentContent.toSeq.sortBy(_.contentSummary.firstPublished)
       } {
         val content = worryinglyAbsentContent.contentSummary
         println(s"${content.timeSinceUrlWentPublic().toMinutes}mins ${content.ophanUrl}\n${content.googleSearchUiUrl}\n")
