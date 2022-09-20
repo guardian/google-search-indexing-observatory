@@ -6,7 +6,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.customsearch.v1.CustomSearchAPI
 import com.google.api.services.customsearch.v1.model.{Result, Search}
 import ophan.google.index.checker.GoogleSearchService.resultMatches
-import ophan.google.index.checker.model.{ContentAvailabilityInGoogleIndex, ContentSummary}
+import ophan.google.index.checker.model.{AvailabilityRecord, CheckReport, ContentAvailabilityInGoogleIndex, ContentSummary}
 
 import java.net.URI
 import java.time.Instant
@@ -33,23 +33,14 @@ class GoogleSearchService(
     ).setApplicationName("flung").build()
 
 
-  def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[ContentAvailabilityInGoogleIndex] = Future {
+  def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[CheckReport] = Future {
     val listRequest = search.cse.list()
       .setKey(apiKey)
       .setCx("415ef252844d240a7")
       .setQ(content.reliableSearchTerm)
-    val checkResult: SortedMap[Instant, Boolean] = Try(listRequest.execute()).map { googleSearchResponse =>
-      val matchingGoogleResult = findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl)
-      val found = matchingGoogleResult.isDefined
-//      if (!found) {
-//        println(content.webUrl)
-//        println(listRequest.buildHttpRequestUrl().build())
-//      }
-      SortedMap(Instant.now -> found)
-    }.getOrElse(SortedMap.empty)
-
-
-    ContentAvailabilityInGoogleIndex(content, checkResult)
+    CheckReport(Instant.now, accessGoogleIndex = Try(listRequest.execute()).map { googleSearchResponse =>
+      findContentMatchInGoogleSearchResponse(googleSearchResponse, content.webUrl).isDefined
+    })
   }
 
 

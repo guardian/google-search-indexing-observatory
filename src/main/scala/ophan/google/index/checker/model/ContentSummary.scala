@@ -6,7 +6,10 @@ import java.net.{URI, URLEncoder}
 import java.nio.charset.StandardCharsets
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.Clock.systemUTC
+import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.MINUTES
 import java.time.{Clock, Duration, Instant}
+import scala.math.Ordering.Implicits._
 
 case class ContentSummary(
   id: String,
@@ -28,6 +31,11 @@ case class ContentSummary(
 
   def timeSinceUrlWentPublic()(implicit clock: Clock = systemUTC): Duration =
     Duration.between(firstPublished, clock.instant())
+
+  def shouldBeCheckedNowGivenExisting(availabilityRecord: AvailabilityRecord)(implicit clock: Clock): Boolean = {
+    !availabilityRecord.contentHasBeenFound &&
+      !availabilityRecord.missing.maxOption.exists(_ > clock.instant().minus(5, MINUTES))
+  }
 }
 
 object ContentSummary {
