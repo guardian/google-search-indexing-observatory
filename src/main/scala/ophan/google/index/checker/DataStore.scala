@@ -25,17 +25,19 @@ object DataStore {
 }
 
 case class DataStore() {
-  def fetchExistingRecordsFor(capiIds: Set[String]): Future[Map[String,AvailabilityRecord]] = (scanamoAsync.exec(
+  def fetchExistingRecordsFor(capiIds: Set[String]): Future[Map[String,AvailabilityRecord]] = scanamoAsync.exec(
     table.getAll("capiId" in capiIds)
-  ).map(_.flatMap(_.toOption).map(record => record.capiId -> record).toMap))
+  ).map(_.flatMap(_.toOption).map(record => record.capiId -> record).toMap)
 
   def update(capiId: String, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
     import DataStore.instantAsISO8601StringFormat
 
-    checkReport.accessGoogleIndex.fold(_ => Future.successful(None), found =>
+    checkReport.accessGoogleIndex.fold(_ => Future.successful(None), found => {
+      val fieldToUpdate = if (found) "found" else "missing"
       scanamoAsync.exec(
-        table.update("capiId" === capiId, append(if (found) "found" else "missing", checkReport.time))
+        table.update("capiId" === capiId, set(fieldToUpdate, checkReport.time))
       ).map(_.toOption)
+    }
     )
   }
 

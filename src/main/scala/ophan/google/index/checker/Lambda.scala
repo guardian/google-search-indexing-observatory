@@ -81,6 +81,7 @@ object Lambda extends Logging {
         contentSummaries.partition(contentThatNeedsCheckingNowGiven(existingRecordsByCapiId))
       updatedAvailabilityReports <- check(contentThatNeedsCheckingNow)
     } yield {
+      println(s"There are ${existingRecordsByCapiId.size}/${contentSummaries.size} existing availability records for content items")
       val unchangedRecordsForContentThatIsKnownToBeFine: Map[String, AvailabilityRecord] = {
         val idsOfContentThatIsKnownToBeFine = contentThatDoesNotNeedCheckingRightNow.map(_.id)
         existingRecordsByCapiId.view.filterKeys(idsOfContentThatIsKnownToBeFine)
@@ -93,6 +94,7 @@ object Lambda extends Logging {
   }
 
   def check(contentSummaries: Set[ContentSummary]): Future[Map[String, AvailabilityRecord]] = {
+    println(s"Checking Google index for ${contentSummaries.size} content items")
     Future.traverse(contentSummaries) { content =>
       for {
         checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(content)
