@@ -38,7 +38,10 @@ assemblyJarName := s"${name.value}.jar"
 riffRaffPackageType := assembly.value
 riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
-riffRaffArtifactResources += (file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json"), s"cloudformation/GoogleSearchIndexChecker-PROD.template.json")
+riffRaffArtifactResources ++= Seq(
+  file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json") -> s"cdk.out/GoogleSearchIndexChecker-PROD.template.json",
+  file("cdk/cdk.out/riff-raff.yaml") -> s"riff-raff.yaml"
+)
 
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
