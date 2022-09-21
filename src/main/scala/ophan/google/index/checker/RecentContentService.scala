@@ -1,11 +1,10 @@
 package ophan.google.index.checker
 
+import com.gu.contentapi.client.ContentApiClient
 import com.gu.contentapi.client.model.SearchQuery
-import com.gu.contentapi.client.{ContentApiClient, GuardianContentClient}
 import ophan.google.index.checker.model.ContentSummary
 
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.HOURS
 import scala.concurrent.{ExecutionContext, Future}
 
