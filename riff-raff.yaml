@@ -12,6 +12,6 @@ deployments:
     app: google-search-index-checker
     dependencies: [ google-search-index-checker ]
     parameters:
-      templatePath: cfn.yaml
+      templatePath: GoogleSearchIndexChecker-PROD.template.json
 regions:
 - eu-west-1

@@ -44,8 +44,19 @@ jobs:
           role-to-assume: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
           aws-region: eu-west-1
 
+      - name: CDK
+        run: |
+          (
+            cd cdk
+            npm ci
+            npm run lint
+            npm test
+            npm run synth
+          )
+
       - name: Upload artefacts to Riffraff
         if: env.isPrFromForkedRepo == 'false'
         run: >
           sbt
           riffRaffUpload
+
