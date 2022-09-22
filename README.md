@@ -1,14 +1,18 @@
 # Ophan Google Search Index Checker
 
-_This is to check if our stories appears in google search_
+_Checking if Guardian content appears in Google search_
  
 To understand more about this problem we are trying to solve check this [document](https://docs.google.com/document/d/1lWOM-6mkGaPsI0YpF2HjrkI--6X1AlinaeIOhfmCy4I/edit?hl=en-GB&forcehl=1) 
 
 ## Steps performed by the checker
 
-1. Hits CAPI for stories published in the last hour. 
-2. Hits [Google Custom Search JSON API](https://developers.google.com/custom-search/v1/introduction) to check if our stories are available in google search index.
-3. Store whether each article is available or not in a database.
+1. Hits the Guardian's Content API (CAPI) for stories published in the last few hours. 
+2. Hits [Google Custom Search Site Restricted JSON API](https://developers.google.com/custom-search/v1/site_restricted_api)
+   to check if our stories are available in Google search.
+   [API Consumption](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/metrics?project=ophan-reborn-2017) &
+   [Cost 💰💰💰](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/cost?project=ophan-reborn-2017)
+   for this can be monitored in the Google Cloud console.
+3. Stores whether each article is available (or not) in an AWS DynamoDb table.
 
 ## Running the Checker locally
 
