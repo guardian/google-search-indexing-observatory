@@ -8,6 +8,10 @@ case object Credentials extends Logging {
     logger.info(Map(
       "credentials.paramName" -> paramName,
     ), s"Loading param: '$paramName'")
-    AWS.SSM.getParameter(_.withDecryption(true).name(paramName)).parameter.value
+    val v = AWS.SSM.getParameter(_.withDecryption(true).name(paramName)).parameter.value
+    logger.info(Map(
+      "credentials.paramName" -> paramName,
+    ), s"Successfully loaded param: '$paramName'")
+    v
   }
 }

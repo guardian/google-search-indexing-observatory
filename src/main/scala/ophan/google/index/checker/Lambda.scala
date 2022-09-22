@@ -21,7 +21,7 @@ object Lambda extends Logging {
   }
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKey")
+    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKeyNotEncrypted")
     new GoogleSearchService(apiKey)
   }
 
