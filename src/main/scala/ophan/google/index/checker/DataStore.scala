@@ -18,7 +18,7 @@ object DataStore {
 
   implicit val formatAvailabilityRecord: DynamoFormat[AvailabilityRecord] = deriveDynamoFormat
 
-  val table = Table[AvailabilityRecord]("roberto-test2-google-search-index-checks")
+  val table = Table[AvailabilityRecord]("ophan-PROD-google-search-index-checker-TableCD117FA1-O6BEZUI0B9CJ") // TODO, read from paramstore?
 
   val scanamoAsync = ScanamoAsync(AWS.dynamoDb)
 
