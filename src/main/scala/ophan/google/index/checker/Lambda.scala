@@ -2,49 +2,31 @@ package ophan.google.index.checker
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
-import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.customsearch.v1.CustomSearchAPI
-import com.google.api.services.customsearch.v1.model.{Result, Search}
-import com.gu.contentapi.client.model.SearchQuery
-import com.gu.contentapi.client.model.v1.Content
-import com.gu.contentapi.client.{ContentApiClient, GuardianContentClient}
+import com.gu.contentapi.client.GuardianContentClient
+import ophan.google.index.checker.Credentials.fetchKeyFromParameterStore
 import ophan.google.index.checker.logging.Logging
-import ophan.google.index.checker.model.{AvailabilityRecord, CheckReport, ContentAvailabilityInGoogleIndex, ContentSummary}
-import org.scanamo.ScanamoAsync
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import ophan.google.index.checker.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary}
 
-import java.net.{URI, URLEncoder}
-import java.nio.charset.StandardCharsets
-import java.nio.charset.StandardCharsets.UTF_8
+import java.time.Clock
 import java.time.Clock.systemUTC
-import java.time.{Clock, Instant}
-import java.util
-import scala.collection.{MapView, mutable}
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 object Lambda extends Logging {
 
-  val paramsPrefix="/PROD/ophan/google-search-index-checker"
-
   val recentContentService: RecentContentService = {
-    val capiKey: String = fetchKeyFromParameterStore(s"$paramsPrefix/CAPI/ApiKey")
+    val capiKey = fetchKeyFromParameterStore("CAPI/ApiKey")
     new RecentContentService(new GuardianContentClient(capiKey))
   }
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParameterStore(s"$paramsPrefix/Google/CustomSearch/ApiKey")
+    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKey")
     new GoogleSearchService(apiKey)
   }
 
   val dataStore = new DataStore()
 
-  private def fetchKeyFromParameterStore(value: String): String =
-    AWS.SSM.getParameter(_.withDecryption(true).name(value)).parameter.value
 
   // content that we have no 'found' record for - AND have not checked too often/recently
   def contentThatNeedsCheckingNowGiven(
