@@ -29,13 +29,15 @@ import scala.concurrent.duration._
 
 object Lambda extends Logging {
 
+  val paramsPrefix="/PROD/ophan/google-search-index-checker"
+
   val recentContentService: RecentContentService = {
-    val capiKey: String = fetchKeyFromParameterStore("/Ophan/dashboard-es7/CODE/ContentApiKey")
+    val capiKey: String = fetchKeyFromParameterStore(s"$paramsPrefix/CAPI/ApiKey")
     new RecentContentService(new GuardianContentClient(capiKey))
   }
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParameterStore("/Ophan/Google/CustomSearch/ApiKey")
+    val apiKey = fetchKeyFromParameterStore(s"$paramsPrefix/Google/CustomSearch/ApiKey")
     new GoogleSearchService(apiKey)
   }
 

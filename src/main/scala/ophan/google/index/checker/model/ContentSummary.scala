@@ -34,7 +34,7 @@ case class ContentSummary(
 
   def shouldBeCheckedNowGivenExisting(availabilityRecord: AvailabilityRecord)(implicit clock: Clock): Boolean = {
     !availabilityRecord.contentHasBeenFound &&
-      !availabilityRecord.missing.maxOption.exists(_ > clock.instant().minus(5, MINUTES))
+      !availabilityRecord.missing.maxOption.exists(_ > clock.instant().minus(3, MINUTES))
   }
 }
 
