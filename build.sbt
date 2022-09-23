@@ -20,24 +20,21 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.0",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.2",
   "org.slf4j" % "log4j-over-slf4j" % "1.7.36", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.2.11",
+  "ch.qos.logback" % "logback-classic" % "1.4.1",
+  "com.lihaoyi" %% "upickle" % "2.0.0",
 
-  "com.lihaoyi" %% "upickle" % "1.6.0",
-  "com.google.guava" % "guava" % "31.1-jre",
   "com.google.http-client" % "google-http-client-gson" % "1.42.2",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M20",
   ("com.gu" %% "content-api-client-default" % "19.0.4").cross(CrossVersion.for3Use2_13),
   "org.scalatest" %% "scalatest" % "3.2.12" % Test
 
-) ++ Seq("ssm", "s3", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
 
 enablePlugins(RiffRaffArtifact, BuildInfoPlugin)
 
 assemblyJarName := s"${name.value}.jar"
 riffRaffPackageType := assembly.value
-riffRaffUploadArtifactBucket := Option("riffraff-artifact")
-riffRaffUploadManifestBucket := Option("riffraff-builds")
 riffRaffArtifactResources := Seq(
   (assembly/assemblyOutputPath).value -> s"${name.value}/${name.value}.jar",
   file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json") -> s"cdk.out/GoogleSearchIndexChecker-PROD.template.json",
