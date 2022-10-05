@@ -9,8 +9,8 @@ case class ContentAvailabilityInGoogleIndex(
   contentSummary: ContentSummary,
   availabilityRecord: AvailabilityRecord
 ) {
-  def contentIsCurrentlyWorryinglyAbsentFromGoogle(gracePeriod: Duration = ofMinutes(1))(implicit clock: Clock = systemUTC): Boolean = {
-    !availabilityRecord.contentHasBeenFound && contentSummary.timeSinceUrlWentPublic() > gracePeriod
-  }
+//  def contentIsCurrentlyWorryinglyAbsentFromGoogle(gracePeriod: Duration = ofMinutes(1))(implicit clock: Clock = systemUTC): Boolean = {
+//    !availabilityRecord.contentHasBeenFound && contentSummary.timeSinceUrlWentPublic() > gracePeriod
+//  }
 
 }
