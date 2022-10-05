@@ -43,7 +43,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-index-checker",
+            "Value": "guardian/ophan-google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -68,16 +68,16 @@ Object {
           "S3Bucket": Object {
             "Ref": "DistributionBucketName",
           },
-          "S3Key": "ophan/TEST/google-search-index-checker/google-search-index-checker.jar",
+          "S3Key": "ophan/TEST/google-search-indexing-observatory/google-search-indexing-observatory.jar",
         },
         "Environment": Object {
           "Variables": Object {
-            "APP": "google-search-index-checker",
+            "APP": "google-search-indexing-observatory",
             "STACK": "ophan",
             "STAGE": "TEST",
           },
         },
-        "Handler": "ophan.google.index.checker.Lambda::handler",
+        "Handler": "ophan.google.index.observatory.Lambda::handler",
         "MemorySize": 1024,
         "Role": Object {
           "Fn::GetAtt": Array [
@@ -89,7 +89,7 @@ Object {
         "Tags": Array [
           Object {
             "Key": "App",
-            "Value": "google-search-index-checker",
+            "Value": "google-search-indexing-observatory",
           },
           Object {
             "Key": "gu:cdk:version",
@@ -97,7 +97,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-index-checker",
+            "Value": "guardian/ophan-google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -143,7 +143,7 @@ Object {
         "Tags": Array [
           Object {
             "Key": "App",
-            "Value": "google-search-index-checker",
+            "Value": "google-search-indexing-observatory",
           },
           Object {
             "Key": "gu:cdk:version",
@@ -151,7 +151,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-index-checker",
+            "Value": "guardian/ophan-google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -204,7 +204,7 @@ Object {
                       Object {
                         "Ref": "DistributionBucketName",
                       },
-                      "/ophan/TEST/google-search-index-checker/google-search-index-checker.jar",
+                      "/ophan/TEST/google-search-indexing-observatory/google-search-indexing-observatory.jar",
                     ],
                   ],
                 },
@@ -225,7 +225,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":parameter/TEST/ophan/google-search-index-checker",
+                    ":parameter/TEST/ophan/google-search-indexing-observatory",
                   ],
                 ],
               },
@@ -248,7 +248,7 @@ Object {
                     Object {
                       "Ref": "AWS::AccountId",
                     },
-                    ":parameter/TEST/ophan/google-search-index-checker/*",
+                    ":parameter/TEST/ophan/google-search-indexing-observatory/*",
                   ],
                 ],
               },

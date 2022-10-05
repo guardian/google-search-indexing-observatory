@@ -1,4 +1,4 @@
-package ophan.google.index.checker.model
+package ophan.google.index.observatory.model
 
 import com.gu.contentapi.client.model.v1.Content
 

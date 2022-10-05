@@ -1,10 +1,10 @@
-package ophan.google.index.checker
+package ophan.google.index.observatory
 
-import ophan.google.index.checker.logging.Logging
+import ophan.google.index.observatory.logging.Logging
 
 case object Credentials extends Logging {
   def fetchKeyFromParameterStore(value: String): String = {
-    val paramName = s"/PROD/ophan/google-search-index-checker/$value"
+    val paramName = s"/PROD/ophan/google-search-indexing-observatory/$value"
     logger.info(Map(
       "credentials.paramName" -> paramName,
     ), s"Loading param: '$paramName'")

@@ -1,7 +1,7 @@
-package ophan.google.index.checker
+package ophan.google.index.observatory
 
-import ophan.google.index.checker.DataStore.{scanamoAsync, table}
-import ophan.google.index.checker.model.{AvailabilityRecord, CheckReport}
+import ophan.google.index.observatory.DataStore.{scanamoAsync, table}
+import ophan.google.index.observatory.model.{AvailabilityRecord, CheckReport}
 import org.scanamo._
 import org.scanamo.generic.semiauto._
 import org.scanamo.syntax._
@@ -18,7 +18,7 @@ object DataStore {
 
   implicit val formatAvailabilityRecord: DynamoFormat[AvailabilityRecord] = deriveDynamoFormat
 
-  val table = Table[AvailabilityRecord]("ophan-PROD-google-search-index-checker-TableCD117FA1-O6BEZUI0B9CJ") // TODO, read from paramstore?
+  val table = Table[AvailabilityRecord]("ophan-PROD-google-search-indexing-observatory-TableCD117FA1-O6BEZUI0B9CJ") // TODO, read from paramstore?
 
   val scanamoAsync = ScanamoAsync(AWS.dynamoDb)
 

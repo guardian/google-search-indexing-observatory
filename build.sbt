@@ -1,10 +1,10 @@
 import com.gu.riffraff.artifact.BuildInfo
 
-name := "google-search-index-checker"
+name := "google-search-indexing-observatory"
 
 organization := "com.gu"
 
-description:= "Checking whether Guardian content is available in google search"
+description:= "Checking how long it takes content published by news organisations to be available in Google search"
 
 version := "1.0"
 
@@ -23,10 +23,10 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.4.1",
   "com.lihaoyi" %% "upickle" % "2.0.0",
 
+  "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.42.2",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M20",
-  ("com.gu" %% "content-api-client-default" % "19.0.4").cross(CrossVersion.for3Use2_13),
   "org.scalatest" %% "scalatest" % "3.2.12" % Test
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
@@ -37,7 +37,7 @@ assemblyJarName := s"${name.value}.jar"
 riffRaffPackageType := assembly.value
 riffRaffArtifactResources := Seq(
   (assembly/assemblyOutputPath).value -> s"${name.value}/${name.value}.jar",
-  file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json") -> s"cdk.out/GoogleSearchIndexChecker-PROD.template.json",
+  file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json") -> s"cdk.out/GoogleSearchIndexingObservatory-PROD.template.json",
   file("cdk/cdk.out/riff-raff.yaml") -> s"riff-raff.yaml"
 )
 
@@ -46,7 +46,7 @@ assembly / assemblyMergeStrategy := {
   case _ => MergeStrategy.first
 }
 
-buildInfoPackage := "ophan.google.index.checker"
+buildInfoPackage := "ophan.google.index.observatory"
 buildInfoKeys := {
   lazy val buildInfo = BuildInfo(baseDirectory.value)
   Seq[BuildInfoKey](

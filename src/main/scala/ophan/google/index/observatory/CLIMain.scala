@@ -1,4 +1,4 @@
-package ophan.google.index.checker
+package ophan.google.index.observatory
 
 /**
  * This class isn't used in production, it's only for local testing.

@@ -1,14 +1,21 @@
-# Ophan Google Search Index Checker
+# Google Search Indexing Observatory
 
-_Checking if Guardian content appears in Google search_
- 
-To understand more about this problem we are trying to solve check this [document](https://docs.google.com/document/d/1lWOM-6mkGaPsI0YpF2HjrkI--6X1AlinaeIOhfmCy4I/edit?hl=en-GB&forcehl=1) 
+_How long does it take for content published by news organisations to be available in Google search?_
 
-## Steps performed by the checker
+This broadens [Ophan's Google Search Index Checker](https://github.com/guardian/ophan-google-search-indexing-observatory)
+to check for content published by _many_ news organisations, not just the Guardian. We're trying to work out if
+the intermittent multi-hour delays we've seen for some Guardian articles to be available in Google Search are
+typical for other news organisations too, or if there's actually something particular to the Guardian that needs
+to be fixed.
 
-1. Hits the Guardian's Content API (CAPI) for stories published in the last few hours. 
-2. Hits [Google Custom Search Site Restricted JSON API](https://developers.google.com/custom-search/v1/site_restricted_api)
-   to check if our stories are available in Google search.
+It's an 'observatory' in the same way that the [EFF SSL Observatory](https://www.eff.org/observatory) is - creating
+and collating observations of distant sites and processes that are visible to us but beyond our control.
+
+## Steps performed by the Observatory
+
+1. Fetch the Sitemap XML for a news site
+2. Hit the [Google Custom Search Site Restricted JSON API](https://developers.google.com/custom-search/v1/site_restricted_api)
+   to check if the content listed is available in Google search.
    [API Consumption](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/metrics?project=ophan-reborn-2017) &
    [Cost 💰💰💰](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/cost?project=ophan-reborn-2017)
    for this can be monitored in the Google Cloud console.

@@ -13,9 +13,9 @@ export class GoogleSearchIndexChecker extends GuStack {
     super(scope, id, props);
     const noMonitoring: NoMonitoring = { noMonitoring: true };
     const scheduledLambda = new GuScheduledLambda(this, "scheduledLambda", {
-      app: "google-search-index-checker",
-      fileName: "google-search-index-checker.jar",
-      handler: "ophan.google.index.checker.Lambda::handler",
+      app: "google-search-indexing-observatory",
+      fileName: "google-search-indexing-observatory.jar",
+      handler: "ophan.google.index.observatory.Lambda::handler",
       monitoringConfiguration: noMonitoring,
       rules: [{ schedule: Schedule.rate(Duration.minutes(1)) }],
       runtime: Runtime.JAVA_11

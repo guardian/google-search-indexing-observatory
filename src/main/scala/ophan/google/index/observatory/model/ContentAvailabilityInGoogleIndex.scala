@@ -1,4 +1,4 @@
-package ophan.google.index.checker.model
+package ophan.google.index.observatory.model
 
 import java.time.Clock.systemUTC
 import java.time.Duration.ofMinutes

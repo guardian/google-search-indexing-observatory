@@ -1,12 +1,12 @@
-package ophan.google.index.checker
+package ophan.google.index.observatory
 
 import com.google.api.client.http.HttpRequest
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.customsearch.v1.CustomSearchAPI
 import com.google.api.services.customsearch.v1.model.{Result, Search}
-import ophan.google.index.checker.GoogleSearchService.resultMatches
-import ophan.google.index.checker.model.{CheckReport, ContentSummary}
+import ophan.google.index.observatory.GoogleSearchService.resultMatches
+import ophan.google.index.observatory.model.{CheckReport, ContentSummary}
 
 import java.net.URI
 import java.time.Instant

@@ -1,4 +1,4 @@
-package ophan.google.index.checker.logging
+package ophan.google.index.observatory.logging
 
 import net.logstash.logback.marker.LogstashMarker
 import net.logstash.logback.marker.Markers.appendEntries

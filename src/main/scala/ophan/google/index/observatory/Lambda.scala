@@ -1,17 +1,18 @@
-package ophan.google.index.checker
+package ophan.google.index.observatory
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import com.gu.contentapi.client.GuardianContentClient
-import ophan.google.index.checker.Credentials.fetchKeyFromParameterStore
-import ophan.google.index.checker.logging.Logging
-import ophan.google.index.checker.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary}
+import ophan.google.index.observatory.Credentials.fetchKeyFromParameterStore
+import ophan.google.index.observatory.logging.Logging
+import ophan.google.index.observatory.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary}
 
 import java.time.Clock
 import java.time.Clock.systemUTC
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import com.madgag.scala.collection.decorators._
 
 object Lambda extends Logging {
 
@@ -71,9 +72,9 @@ object Lambda extends Logging {
         existingRecordsByCapiId.view.filterKeys(idsOfContentThatIsKnownToBeFine)
       }.toMap
 
-      (unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports).view.mapValues { record =>
+      (unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports).mapV { record =>
         ContentAvailabilityInGoogleIndex(contentSummariesById(record.capiId), record)
-      }.toMap
+      }
     }
   }
 

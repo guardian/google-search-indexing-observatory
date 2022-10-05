@@ -1,6 +1,6 @@
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
-import { GoogleSearchIndexChecker } from "./google-search-index-checker";
+import { GoogleSearchIndexChecker } from "./google-search-indexing-observatory";
 
 describe("The GoogleSearchIndexChecker stack", () => {
   it("matches the snapshot", () => {
