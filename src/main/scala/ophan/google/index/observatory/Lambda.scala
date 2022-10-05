@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import ophan.google.index.observatory.Credentials.fetchKeyFromParameterStore
 import ophan.google.index.observatory.logging.Logging
-import ophan.google.index.observatory.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary}
+import ophan.google.index.observatory.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary, Site}
 
 import java.time.Clock
 import java.time.Clock.systemUTC
@@ -12,6 +12,18 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import com.madgag.scala.collection.decorators._
+
+import java.net.http.HttpClient
+import java.net.http.HttpClient.Redirect
+import java.net.http.HttpClient.Version.HTTP_2
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse.BodyHandlers
+import java.time.Duration.ofSeconds
+
+import scala.jdk.FutureConverters._
+
+
+
 
 object Lambda extends Logging {
 
@@ -22,6 +34,9 @@ object Lambda extends Logging {
 
   val dataStore = new DataStore()
 
+  val client: HttpClient = HttpClient.newBuilder.version(HTTP_2).followRedirects(Redirect.NORMAL)
+    .connectTimeout(ofSeconds(20)).build
+
 
   // content that we have no 'found' record for - AND have not checked too often/recently
 //  def contentThatNeedsCheckingNowGiven(
@@ -29,10 +44,21 @@ object Lambda extends Logging {
 //  )(content: ContentSummary)(implicit clock:Clock = systemUTC): Boolean =
 //    existingRecordsByCapiId.get(content.id).forall(content.shouldBeCheckedNowGivenExisting)
 
+  def handleSite(site: Site): Unit = {
+
+    val entries = Future.traverse(site.sitemaps) { sitemapUrl =>
+      client.sendAsync(HttpRequest.newBuilder(sitemapUrl).GET().build(), BodyHandlers.ofInputStream()).asScala
+        .map { response =>
+          SitemapParser.parse(response.body, site.url)
+        }
+    }.map(_.flatten)
+  }
   /*
        * Logic handler
        */
   def go(): Unit = {
+
+
 //    val eventual = for {
 //      contentSummaries <- recentContentService.fetchRecentContent()
 //      availability <- availabilityFor(contentSummaries.toSet)
