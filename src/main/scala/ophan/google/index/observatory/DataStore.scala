@@ -1,44 +1,37 @@
 package ophan.google.index.observatory
 
 import ophan.google.index.observatory.DataStore.{scanamoAsync, table}
+import ophan.google.index.observatory.model.AvailabilityRecord._
 import ophan.google.index.observatory.model.{AvailabilityRecord, CheckReport}
 import org.scanamo._
-import org.scanamo.generic.semiauto._
 import org.scanamo.syntax._
+import org.scanamo.update.UpdateExpression
 
-import java.time.Instant
-import java.time.format.DateTimeParseException
-import java.time.temporal.ChronoUnit.SECONDS
+import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object DataStore {
-  implicit val instantAsISO8601StringFormat: DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, String, DateTimeParseException](Instant.parse, _.truncatedTo(SECONDS).toString)
 
-  implicit val formatAvailabilityRecord: DynamoFormat[AvailabilityRecord] = deriveDynamoFormat
+  val table: Table[AvailabilityRecord] = Table("observatory-table") // TODO, read from paramstore?
 
-  val table = Table[AvailabilityRecord]("ophan-PROD-google-search-indexing-observatory-TableCD117FA1-O6BEZUI0B9CJ") // TODO, read from paramstore?
-
-  val scanamoAsync = ScanamoAsync(AWS.dynamoDb)
+  val scanamoAsync: ScanamoAsync = ScanamoAsync(AWS.dynamoDb)
 
 }
 
 case class DataStore() {
-  def fetchExistingRecordsFor(capiIds: Set[String]): Future[Map[String,AvailabilityRecord]] = scanamoAsync.exec(
-    table.getAll("capiId" in capiIds)
-  ).map(_.flatMap(_.toOption).map(record => record.capiId -> record).toMap)
+  def fetchExistingRecordsFor(uris: Set[URI]): Future[Map[URI,AvailabilityRecord]] = scanamoAsync.exec(
+    table.getAll(Field.Uri in uris)
+  ).map(_.flatMap(_.toOption).map(record => record.uri -> record).toMap)
 
-  def update(capiId: String, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
-    import DataStore.instantAsISO8601StringFormat
+  def update(uri: URI, noExistingRecord: Boolean, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
+    val updateExpressionOpt: Option[UpdateExpression] = (checkReport.asUpdateExpression.toSeq ++
+      Option.when(noExistingRecord)(set(Field.FirstSeenInSitemap, checkReport.time))).reduceOption(_ and _)
 
-    checkReport.accessGoogleIndex.fold(_ => Future.successful(None), found => {
-      val fieldToUpdate = if (found) "found" else "missing"
+    updateExpressionOpt.fold[Future[Option[AvailabilityRecord]]](Future.successful(None)) { updateExpression =>
       scanamoAsync.exec(
-        table.update("capiId" === capiId, set(fieldToUpdate, checkReport.time))
+        table.update(Field.Uri === uri, updateExpression)
       ).map(_.toOption)
     }
-    )
   }
-
 }

@@ -29,7 +29,7 @@ class GoogleSearchService(
       }
     ).setApplicationName("search-index-checker").build()
 
-  def contentAvailabilityInGoogleIndex(content: ContentSummary): Future[CheckReport] = Future { blocking {
+  def contentAvailabilityInGoogleIndex(uri: URI): Future[CheckReport] = Future { blocking {
       val listRequest = search.cse.siterestrict.list()
         .setKey(apiKey)
         .setCx("415ef252844d240a7") // see https://programmablesearchengine.google.com/controlpanel/all
