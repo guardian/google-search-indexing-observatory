@@ -1,7 +1,7 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import com.madgag.scala.collection.decorators.MapDecorator
-import ophan.google.index.observatory.model.{AvailabilityRecord, ContentSummary, Site}
+import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site}
 
 import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}

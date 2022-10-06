@@ -1,4 +1,4 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 /**
  * This class isn't used in production, it's only for local testing.

@@ -1,4 +1,4 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import com.google.api.services.customsearch.v1.model.Result
 import org.scalatest.flatspec.AnyFlatSpec

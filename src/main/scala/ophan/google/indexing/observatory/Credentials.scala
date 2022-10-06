@@ -1,6 +1,6 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
-import ophan.google.index.observatory.logging.Logging
+import ophan.google.indexing.observatory.logging.Logging
 
 case object Credentials extends Logging {
   def fetchKeyFromParameterStore(value: String): String = {

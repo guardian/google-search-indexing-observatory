@@ -1,10 +1,8 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
-import ophan.google.index.observatory.Credentials.fetchKeyFromParameterStore
-import ophan.google.index.observatory.logging.Logging
-import ophan.google.index.observatory.model.{AvailabilityRecord, ContentSummary, Site, Sites}
+import Credentials.fetchKeyFromParameterStore
 
 import java.time.Clock
 import java.time.Clock.systemUTC
@@ -12,6 +10,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import com.madgag.scala.collection.decorators._
+import ophan.google.indexing.observatory.logging.Logging
+import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site, Sites}
 
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect

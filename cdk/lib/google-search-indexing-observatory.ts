@@ -8,21 +8,21 @@ import {Duration} from "aws-cdk-lib";
 import {NoMonitoring} from "@guardian/cdk/lib/constructs/cloudwatch";
 import {AttributeType, Table} from "aws-cdk-lib/aws-dynamodb";
 
-export class GoogleSearchIndexChecker extends GuStack {
+export class GoogleSearchIndexingObservatory extends GuStack {
   constructor(scope: App, id: string, props: GuStackProps) {
     super(scope, id, props);
     const noMonitoring: NoMonitoring = { noMonitoring: true };
     const scheduledLambda = new GuScheduledLambda(this, "scheduledLambda", {
       app: "google-search-indexing-observatory",
       fileName: "google-search-indexing-observatory.jar",
-      handler: "ophan.google.index.observatory.Lambda::handler",
+      handler: "ophan.google.indexing.observatory.Lambda::handler",
       monitoringConfiguration: noMonitoring,
       rules: [{ schedule: Schedule.rate(Duration.minutes(1)) }],
       runtime: Runtime.JAVA_11
     })
     const table = new Table(this, 'Table', {
       partitionKey: {
-        name: 'capiId',
+        name: 'uri',
         type: AttributeType.STRING,
       },
     });

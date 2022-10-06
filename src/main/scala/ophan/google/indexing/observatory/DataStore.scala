@@ -1,8 +1,8 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
-import ophan.google.index.observatory.DataStore.{scanamoAsync, table}
-import ophan.google.index.observatory.model.AvailabilityRecord._
-import ophan.google.index.observatory.model.{AvailabilityRecord, CheckReport}
+import DataStore.{scanamoAsync, table}
+import ophan.google.indexing.observatory.model.AvailabilityRecord._
+import ophan.google.indexing.observatory.model.{AvailabilityRecord, CheckReport}
 import org.scanamo._
 import org.scanamo.syntax._
 import org.scanamo.update.UpdateExpression

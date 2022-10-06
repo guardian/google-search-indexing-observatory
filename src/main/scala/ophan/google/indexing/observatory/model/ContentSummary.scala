@@ -1,4 +1,4 @@
-package ophan.google.index.observatory.model
+package ophan.google.indexing.observatory.model
 
 import java.net.{URI, URLEncoder}
 import java.nio.charset.StandardCharsets

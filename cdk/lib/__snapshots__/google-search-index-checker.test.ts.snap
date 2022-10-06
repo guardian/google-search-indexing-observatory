@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`The GoogleSearchIndexChecker stack matches the snapshot 1`] = `
+exports[`The GoogleSearchIndexingObservatory stack matches the snapshot 1`] = `
 Object {
   "Metadata": Object {
     "gu:cdk:constructs": Array [

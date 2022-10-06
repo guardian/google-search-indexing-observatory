@@ -1,6 +1,7 @@
-package ophan.google.index.observatory.model
+package ophan.google.indexing.observatory.model
 
-import ophan.google.index.observatory.model.AvailabilityRecord.Field
+import AvailabilityRecord.Field
+import ophan.google.indexing.observatory.model.AvailabilityRecord.Field
 import org.scanamo.syntax._
 import org.scanamo.update.UpdateExpression
 

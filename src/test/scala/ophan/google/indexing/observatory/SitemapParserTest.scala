@@ -1,4 +1,4 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

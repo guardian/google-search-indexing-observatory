@@ -39,7 +39,7 @@ assemblyJarName := s"${name.value}.jar"
 riffRaffPackageType := assembly.value
 riffRaffArtifactResources := Seq(
   (assembly/assemblyOutputPath).value -> s"${name.value}/${name.value}.jar",
-  file("cdk/cdk.out/GoogleSearchIndexChecker-PROD.template.json") -> s"cdk.out/GoogleSearchIndexingObservatory-PROD.template.json",
+  file("cdk/cdk.out/GoogleSearchIndexingObservatory-PROD.template.json") -> s"cdk.out/GoogleSearchIndexingObservatory-PROD.template.json",
   file("cdk/cdk.out/riff-raff.yaml") -> s"riff-raff.yaml"
 )
 
@@ -48,7 +48,7 @@ assembly / assemblyMergeStrategy := {
   case _ => MergeStrategy.first
 }
 
-buildInfoPackage := "ophan.google.index.observatory"
+buildInfoPackage := "ophan.google.indexing.observatory"
 buildInfoKeys := {
   lazy val buildInfo = BuildInfo(baseDirectory.value)
   Seq[BuildInfoKey](

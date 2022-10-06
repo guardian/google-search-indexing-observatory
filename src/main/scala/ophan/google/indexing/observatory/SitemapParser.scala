@@ -1,4 +1,4 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import com.bnsal.SitemapParser
 

@@ -1,4 +1,4 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
 import software.amazon.awssdk.auth.credentials._
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder

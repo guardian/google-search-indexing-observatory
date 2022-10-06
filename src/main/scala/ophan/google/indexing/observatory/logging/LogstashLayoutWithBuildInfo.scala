@@ -1,9 +1,9 @@
-package ophan.google.index.observatory.logging
+package ophan.google.indexing.observatory.logging
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import com.amazonaws.services.lambda.runtime.LambdaRuntimeInternal
 import net.logstash.logback.layout.LogstashLayout
-import ophan.google.index.observatory.BuildInfo
+import ophan.google.indexing.observatory.BuildInfo
 import upickle.default._
 
 object UniqueIdForVM {

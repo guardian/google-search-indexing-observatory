@@ -1,7 +1,6 @@
-package ophan.google.index.observatory
+package ophan.google.indexing.observatory
 
-import ophan.google.index.observatory.model.Site
-
+import ophan.google.indexing.observatory.model.Site
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect

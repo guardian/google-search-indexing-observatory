@@ -1,4 +1,4 @@
-package ophan.google.index.observatory.model
+package ophan.google.indexing.observatory.model
 
 import java.net.{URI, URISyntaxException}
 import java.time.{Clock, Duration, Instant}
