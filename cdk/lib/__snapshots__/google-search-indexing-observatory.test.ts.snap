@@ -22,13 +22,13 @@ Object {
       "Properties": Object {
         "AttributeDefinitions": Array [
           Object {
-            "AttributeName": "capiId",
+            "AttributeName": "uri",
             "AttributeType": "S",
           },
         ],
         "KeySchema": Array [
           Object {
-            "AttributeName": "capiId",
+            "AttributeName": "uri",
             "KeyType": "HASH",
           },
         ],
@@ -43,7 +43,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-indexing-observatory",
+            "Value": "guardian/google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -77,7 +77,7 @@ Object {
             "STAGE": "TEST",
           },
         },
-        "Handler": "ophan.google.index.observatory.Lambda::handler",
+        "Handler": "ophan.google.indexing.observatory.Lambda::handler",
         "MemorySize": 1024,
         "Role": Object {
           "Fn::GetAtt": Array [
@@ -97,7 +97,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-indexing-observatory",
+            "Value": "guardian/google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -151,7 +151,7 @@ Object {
           },
           Object {
             "Key": "gu:repo",
-            "Value": "guardian/ophan-google-search-indexing-observatory",
+            "Value": "guardian/google-search-indexing-observatory",
           },
           Object {
             "Key": "Stack",
@@ -311,7 +311,7 @@ Object {
       },
       "Type": "AWS::Events::Rule",
     },
-    "scheduledLambdascheduledLambdarate1minute0AllowEventRuleGoogleSearchIndexCheckerscheduledLambdaF24F17D8E6B28C2B": Object {
+    "scheduledLambdascheduledLambdarate1minute0AllowEventRuleGoogleSearchIndexingObservatoryscheduledLambda2A2AC158D4E5E85C": Object {
       "Properties": Object {
         "Action": "lambda:InvokeFunction",
         "FunctionName": Object {
