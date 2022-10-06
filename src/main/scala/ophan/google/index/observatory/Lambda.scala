@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
 import ophan.google.index.observatory.Credentials.fetchKeyFromParameterStore
 import ophan.google.index.observatory.logging.Logging
-import ophan.google.index.observatory.model.{AvailabilityRecord, ContentAvailabilityInGoogleIndex, ContentSummary, Site, Sites}
+import ophan.google.index.observatory.model.{AvailabilityRecord, ContentSummary, Site, Sites}
 
 import java.time.Clock
 import java.time.Clock.systemUTC
@@ -35,6 +35,8 @@ object Lambda extends Logging {
 
   val dataStore = new DataStore()
 
+  val availabilityUpdaterService = new AvailabilityUpdaterService(dataStore, googleSearchService)
+
   // content that we have no 'found' record for - AND have not checked too often/recently
 //  def contentThatNeedsCheckingNowGiven(
 //    existingRecordsByCapiId: Map[String,AvailabilityRecord]
@@ -42,15 +44,26 @@ object Lambda extends Logging {
 //    existingRecordsByCapiId.get(content.id).forall(content.shouldBeCheckedNowGivenExisting)
 
   /*
-       * Logic handler
-       */
+   * Logic handler
+   */
   def go(): Unit = {
-    Future.traverse(Sites.All) { site =>
-      sitemapDownloader.fetchSitemapEntriesFor(site)
+    val eventual = Future.traverse(Sites.All) { site =>
+      println(s"Handing site ${site.url}")
+      for {
+        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site)
+        updatedAvailabilityRecords <- availabilityUpdaterService.availabilityFor(sitemapEntries, site)
+      } yield {
+        println(s"Completed site ${site.url}")
+        updatedAvailabilityRecords
+      }
     }
 
+    Await.result(eventual, 20.seconds)
+    println("Everything complete")
 
-//    val eventual = for {
+
+
+    //    val eventual = for {
 //      contentSummaries <- recentContentService.fetchRecentContent()
 //      availability <- availabilityFor(contentSummaries.toSet)
 //    } yield {

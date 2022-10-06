@@ -24,9 +24,9 @@ case class DataStore() {
     table.getAll(Field.Uri in uris)
   ).map(_.flatMap(_.toOption).map(record => record.uri -> record).toMap)
 
-  def update(uri: URI, noExistingRecord: Boolean, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
+  def update(uri: URI, hasExistingRecord: Boolean, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
     val updateExpressionOpt: Option[UpdateExpression] = (checkReport.asUpdateExpression.toSeq ++
-      Option.when(noExistingRecord)(set(Field.FirstSeenInSitemap, checkReport.time))).reduceOption(_ and _)
+      Option.when(!hasExistingRecord)(set(Field.FirstSeenInSitemap, checkReport.time))).reduceOption(_ and _)
 
     updateExpressionOpt.fold[Future[Option[AvailabilityRecord]]](Future.successful(None)) { updateExpression =>
       scanamoAsync.exec(
