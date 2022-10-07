@@ -6,6 +6,7 @@ import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.customsearch.v1.CustomSearchAPI
 import com.google.api.services.customsearch.v1.model.{Result, Search}
 import GoogleSearchService.{reliableSearchTermFor, resultMatches}
+import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{CheckReport, ContentSummary, Site}
 
 import java.net.URI
@@ -18,7 +19,7 @@ class GoogleSearchService(
   apiKey: String
 )(implicit
   ec: ExecutionContext
-) {
+) extends Logging {
   val search =
     new CustomSearchAPI.Builder(
       new NetHttpTransport,
@@ -34,7 +35,11 @@ class GoogleSearchService(
         .setKey(apiKey)
         .setCx(site.searchEngineId) // see https://programmablesearchengine.google.com/controlpanel/all
         .setQ(reliableSearchTermFor(uri))
-      CheckReport(Instant.now, accessGoogleIndex = Try(listRequest.execute()).map { googleSearchResponse =>
+    val attemptExecute = Try(listRequest.execute())
+    if (attemptExecute.isSuccess)
+      logger.info(s"Successful request for ${site.url}")
+
+    CheckReport(Instant.now, accessGoogleIndex = attemptExecute.map { googleSearchResponse =>
         findContentMatchInGoogleSearchResponse(googleSearchResponse, uri).isDefined
       })
     }
@@ -60,7 +65,6 @@ object GoogleSearchService {
    * reliably should get this content as one of the top hits. The headline of
    * the article would be one candidate for the value, but the headlines can
    * contain characters that are difficult to escape, eg quotes & double-quotes.
-   * The path of the webUrl is fairly reliable, so far as I can see.
    */
-  def reliableSearchTermFor(uri: URI): String = s""""${uri.getPath}""""
+  def reliableSearchTermFor(uri: URI): String = uri.toString
 }

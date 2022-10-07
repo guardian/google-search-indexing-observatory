@@ -13,6 +13,7 @@ import com.madgag.scala.collection.decorators._
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site, Sites}
 
+import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
 import java.net.http.HttpClient.Version.HTTP_2
@@ -29,7 +30,7 @@ object Lambda extends Logging {
   val sitemapDownloader = new SitemapDownloader()
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKeyNotEncrypted")
+    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKey")
     new GoogleSearchService(apiKey)
   }
 
@@ -50,7 +51,11 @@ object Lambda extends Logging {
     val eventual = Future.traverse(Sites.All) { site =>
       println(s"Handing site ${site.url}")
       for {
-        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site)
+        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site).recover {
+          case e =>
+            logger.warn(s"Failed to get sitemap for ${site.url}")
+            Set.empty[URI]
+        }
         updatedAvailabilityRecords <- availabilityUpdaterService.availabilityFor(sitemapEntries, site)
       } yield {
         println(s"Completed site ${site.url}")

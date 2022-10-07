@@ -1,6 +1,8 @@
 package ophan.google.indexing.observatory
 
 import com.madgag.scala.collection.decorators.MapDecorator
+import ophan.google.indexing.observatory.Credentials.logger
+import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site}
 
 import java.net.URI
@@ -11,7 +13,7 @@ case class AvailabilityUpdaterService(
   googleSearchService: GoogleSearchService
 )(implicit
   ec: ExecutionContext
-) {
+) extends Logging {
 
   def availabilityFor(uris: Set[URI], site: Site): Future[Map[URI, AvailabilityRecord]] = {
     for {
@@ -42,8 +44,15 @@ case class AvailabilityUpdaterService(
     val combined: Set[(URI, Boolean)] =
       urisForWhichThereIsNoExistingRecord.map(_ -> false) ++ existingRecordsThatNeedCheckingNow.map(_.uri -> true)
 
-    println(s"Checking Google index for ${combined.size} sitemap items")
-    Future.traverse(combined) { case (uri, hasExistingRecord) =>
+    val throttledList = combined.take(50)
+
+    logger.info(Map(
+      "site" -> site.url,
+      "uris.needingChecking" -> combined.size,
+      "uris.toAttempt" -> throttledList.size,
+    ), s"Checking Google index for ${throttledList.size}/${combined.size} sitemap items")
+
+    Future.traverse(throttledList) { case (uri, hasExistingRecord) =>
       for {
         checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(uri, site)
         updatedAvailabilityRecord <- dataStore.update(uri, hasExistingRecord, checkReport)

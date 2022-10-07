@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 object DataStore {
 
-  val table: Table[AvailabilityRecord] = Table("observatory-table") // TODO, read from paramstore?
+  val table: Table[AvailabilityRecord] = Table("ophan-PROD-google-search-indexing-observatory-TableCD117FA1-D1EFSGIPXO63") // TODO, read from paramstore?
 
   val scanamoAsync: ScanamoAsync = ScanamoAsync(AWS.dynamoDb)
 
