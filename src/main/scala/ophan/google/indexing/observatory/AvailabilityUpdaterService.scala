@@ -44,7 +44,7 @@ case class AvailabilityUpdaterService(
     val combined: Set[(URI, Boolean)] =
       urisForWhichThereIsNoExistingRecord.map(_ -> false) ++ existingRecordsThatNeedCheckingNow.map(_.uri -> true)
 
-    val throttledList = combined.take(50)
+    val throttledList = combined.take(10)
 
     logger.info(Map(
       "site" -> site.url,
