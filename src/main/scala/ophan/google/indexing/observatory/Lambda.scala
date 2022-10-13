@@ -21,6 +21,8 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.Duration.ofSeconds
 import scala.jdk.FutureConverters._
+import cats.data.EitherT
+import cats.implicits._
 
 
 
@@ -50,18 +52,15 @@ object Lambda extends Logging {
   def go(): Unit = {
     val eventual = Future.traverse(Sites.All) { site =>
       println(s"Handing site ${site.url}")
-      for {
-        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site).recover {
-          case e =>
-            e.printStackTrace()
-            logger.warn(s"Failed to get sitemap for ${site.url}", e)
-            Set.empty[URI]
-        }
-        updatedAvailabilityRecords <- availabilityUpdaterService.availabilityFor(sitemapEntries, site)
+
+      (for {
+        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site).attemptT
+        updatedAvailabilityRecords <-
+          EitherT.right[Throwable](availabilityUpdaterService.availabilityFor(sitemapEntries, site))
       } yield {
         println(s"Completed site ${site.url}")
         updatedAvailabilityRecords
-      }
+      }).value
     }
 
     Await.result(eventual, 40.seconds)

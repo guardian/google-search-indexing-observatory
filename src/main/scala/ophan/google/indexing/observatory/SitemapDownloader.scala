@@ -21,8 +21,18 @@ class SitemapDownloader(implicit
 
   def fetchSitemapEntriesFor(site: Site): Future[Set[URI]] = Future.traverse(site.sitemaps) { sitemapUrl =>
     client.sendAsync(HttpRequest.newBuilder(sitemapUrl).GET().build(), BodyHandlers.ofInputStream()).asScala.map { response =>
-      logger.info(s"Got reponse code ${response.statusCode()} from ${sitemapUrl}")
-      SitemapParser.parse(response.body, site.url)
+      logger.info(Map(
+        "site" -> site.url,
+        "sitemap.url" -> sitemapUrl,
+        "sitemap.response.statusCode" -> response.statusCode()
+      ), s"Received HTTP ${response.statusCode()} response for $sitemapUrl sitemap")
+      val uris: Set[URI] = SitemapParser.parse(response.body, site.url)
+      logger.info(Map(
+        "site" -> site.url,
+        "sitemap.url" -> sitemapUrl,
+        "sitemap.uris.size" -> uris.size
+      ), s"Found ${uris.size} uris in $sitemapUrl sitemap")
+      uris
     }
   }.map(_.flatten)
 }
