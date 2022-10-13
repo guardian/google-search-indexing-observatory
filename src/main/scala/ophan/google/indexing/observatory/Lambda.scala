@@ -53,7 +53,8 @@ object Lambda extends Logging {
       for {
         sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site).recover {
           case e =>
-            logger.warn(s"Failed to get sitemap for ${site.url}")
+            e.printStackTrace()
+            logger.warn(s"Failed to get sitemap for ${site.url}", e)
             Set.empty[URI]
         }
         updatedAvailabilityRecords <- availabilityUpdaterService.availabilityFor(sitemapEntries, site)
@@ -63,7 +64,7 @@ object Lambda extends Logging {
       }
     }
 
-    Await.result(eventual, 20.seconds)
+    Await.result(eventual, 40.seconds)
     println("Everything complete")
 
 

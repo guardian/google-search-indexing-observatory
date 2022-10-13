@@ -24,7 +24,7 @@ case class AvailabilityUpdaterService(
       updatedAvailabilityReports <-
         check(urisForWhichThereIsNoExistingRecord, existingRecordsThatNeedCheckingNow, site)
     } yield {
-      println(s"There are ${existingRecordsByUri.size}/${uris.size} existing availability records for content items")
+      println(s"There are ${existingRecordsByUri.size}/${uris.size} existing availability records for content items in ${site.url}")
       val unchangedRecordsForContentThatIsKnownToBeFine: Map[URI, AvailabilityRecord] = {
         val urisOfContentThatIsKnownToBeFine = existingRecordsThatDoNotNeedCheckingRightNow.map(_.uri)
         existingRecordsByUri.view.filterKeys(urisOfContentThatIsKnownToBeFine)

@@ -1,6 +1,8 @@
 package ophan.google.indexing.observatory
 
+import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.Site
+
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
@@ -13,12 +15,13 @@ import scala.jdk.FutureConverters._
 
 class SitemapDownloader(implicit
  ec: ExecutionContext
-) {
+) extends Logging {
   val client: HttpClient = HttpClient.newBuilder.version(HTTP_2).followRedirects(Redirect.NORMAL)
     .connectTimeout(ofSeconds(20)).build
 
   def fetchSitemapEntriesFor(site: Site): Future[Set[URI]] = Future.traverse(site.sitemaps) { sitemapUrl =>
     client.sendAsync(HttpRequest.newBuilder(sitemapUrl).GET().build(), BodyHandlers.ofInputStream()).asScala.map { response =>
+      logger.info(s"Got reponse code ${response.statusCode()} from ${sitemapUrl}")
       SitemapParser.parse(response.body, site.url)
     }
   }.map(_.flatten)
