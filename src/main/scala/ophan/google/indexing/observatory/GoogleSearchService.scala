@@ -37,7 +37,7 @@ class GoogleSearchService(
         .setQ(reliableSearchTermFor(uri))
     val attemptExecute = Try(listRequest.execute())
     if (attemptExecute.isSuccess)
-      logger.info(s"Successful request for ${site.url}")
+      logger.debug(s"Successful request for ${site.url}")
 
     CheckReport(Instant.now, accessGoogleIndex = attemptExecute.map { googleSearchResponse =>
         findContentMatchInGoogleSearchResponse(googleSearchResponse, uri).isDefined
