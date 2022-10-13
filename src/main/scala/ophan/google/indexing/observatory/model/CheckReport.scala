@@ -9,6 +9,7 @@ import java.time.Instant
 import scala.util.Try
 
 case class CheckReport(time: Instant, accessGoogleIndex: Try[Boolean]) {
+  import AvailabilityRecord.instantAsISO8601StringFormat
   val asUpdateExpression: Option[UpdateExpression] =
     accessGoogleIndex.toOption.map(found => set(Field.timestampFor(found), time))
 }
