@@ -1,6 +1,7 @@
 package ophan.google.indexing.observatory
 
 import DataStore.{scanamoAsync, table}
+import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.AvailabilityRecord._
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, CheckReport}
 import org.scanamo._
@@ -19,16 +20,26 @@ object DataStore {
 
 }
 
-case class DataStore() {
+case class DataStore() extends Logging {
   def fetchExistingRecordsFor(uris: Set[URI]): Future[Map[URI,AvailabilityRecord]] = scanamoAsync.exec(
     table.getAll(Field.Uri in uris)
   ).map(_.flatMap(_.toOption).map(record => record.uri -> record).toMap)
 
-  def update(uri: URI, hasExistingRecord: Boolean, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
-    val updateExpressionOpt: Option[UpdateExpression] = (checkReport.asUpdateExpression.toSeq ++
-      Option.when(!hasExistingRecord)(set(Field.FirstSeenInSitemap, checkReport.time))).reduceOption(_ and _)
+  def storeNewRecordsFor(sitemapDownload: SitemapDownload, alreadyKnownUris: Set[URI]): Future[Unit] = {
+    val urisNotSeenBefore = sitemapDownload.allUris -- alreadyKnownUris
+    logger.info(Map(
+      "site" -> sitemapDownload.site.url,
+      "site.sitemap.uris.all" -> sitemapDownload.allUris.size,
+      "site.sitemap.uris.old" -> alreadyKnownUris.size,
+      "site.sitemap.uris.new" -> urisNotSeenBefore.size
+    ), s"Storing ${urisNotSeenBefore.size} new uris for ${sitemapDownload.site.url}")
+    scanamoAsync.exec(
+      table.putAll(urisNotSeenBefore.map(uri => AvailabilityRecord(uri,sitemapDownload.timestamp)))
+    )
+  }
 
-    updateExpressionOpt.fold[Future[Option[AvailabilityRecord]]](Future.successful(None)) { updateExpression =>
+  def update(uri: URI, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
+    checkReport.asUpdateExpression.fold(Future.successful(Option.empty[AvailabilityRecord])) { updateExpression =>
       scanamoAsync.exec(
         table.update(Field.Uri === uri, updateExpression)
       ).map(_.toOption)

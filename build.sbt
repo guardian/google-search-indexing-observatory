@@ -15,6 +15,8 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 
+val catsVersion = "2.8.0"
+
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.0",
@@ -27,7 +29,9 @@ libraryDependencies ++= Seq(
   "com.google.http-client" % "google-http-client-gson" % "1.42.2",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M20",
-  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+  "org.typelevel" %% "cats-core" % catsVersion,
+  "org.typelevel" %% "alleycats-core" % catsVersion,
 
   "com.bnsal" % "sitemap-parser" % "1.0.3"
 

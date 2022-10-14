@@ -1,12 +1,13 @@
 package ophan.google.indexing.observatory
 
-import com.madgag.scala.collection.decorators.MapDecorator
-import ophan.google.indexing.observatory.Credentials.logger
+import cats.implicits._
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site}
+import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 
 import java.net.URI
+import java.time.temporal.ChronoUnit.MINUTES
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.Ordering.Implicits._
 
 case class AvailabilityUpdaterService(
   dataStore: DataStore,
@@ -15,49 +16,56 @@ case class AvailabilityUpdaterService(
   ec: ExecutionContext
 ) extends Logging {
 
-  def availabilityFor(uris: Set[URI], site: Site): Future[Map[URI, AvailabilityRecord]] = {
+  def availabilityFor(sitemapDownload: SitemapDownload): Future[Map[URI, AvailabilityRecord]] = {
     for {
-      existingRecordsByUri <- dataStore.fetchExistingRecordsFor(uris)
-      (existingRecordsThatNeedCheckingNow, existingRecordsThatDoNotNeedCheckingRightNow) =
-        existingRecordsByUri.values.toSet.partition(_.needsCheckingNow())
-      urisForWhichThereIsNoExistingRecord = uris -- existingRecordsByUri.keySet
+      existingRecordsByUri <- dataStore.fetchExistingRecordsFor(sitemapDownload.allUris)
+      _ = dataStore.storeNewRecordsFor(sitemapDownload, existingRecordsByUri.keySet) // Don't wait for this to complete
       updatedAvailabilityReports <-
-        check(urisForWhichThereIsNoExistingRecord, existingRecordsThatNeedCheckingNow, site)
+        checkMostUrgentOf(existingRecordsByUri, sitemapDownload.site)
     } yield {
-      println(s"There are ${existingRecordsByUri.size}/${uris.size} existing availability records for content items in ${site.url}")
-      val unchangedRecordsForContentThatIsKnownToBeFine: Map[URI, AvailabilityRecord] = {
-        val urisOfContentThatIsKnownToBeFine = existingRecordsThatDoNotNeedCheckingRightNow.map(_.uri)
-        existingRecordsByUri.view.filterKeys(urisOfContentThatIsKnownToBeFine)
-      }.toMap
-
-      unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports
+//      val unchangedRecordsForContentThatIsKnownToBeFine: Map[URI, AvailabilityRecord] = {
+//        val urisOfContentThatIsKnownToBeFine = existingRecordsThatDoNotNeedCheckingRightNow.map(_.uri)
+//        existingRecordsByUri.view.filterKeys(urisOfContentThatIsKnownToBeFine)
+//      }.toMap
+      updatedAvailabilityReports
+//      unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports
     }
   }
 
-  def check(
-    urisForWhichThereIsNoExistingRecord: Set[URI],
-    existingRecordsThatNeedCheckingNow: Set[AvailabilityRecord],
+  def checkMostUrgentOf(
+    existingRecordsByURI: Map[URI, AvailabilityRecord],
     site: Site
   ): Future[Map[URI, AvailabilityRecord]] = {
-    require(existingRecordsThatNeedCheckingNow.map(_.uri).intersect(urisForWhichThereIsNoExistingRecord).isEmpty)
+    val existingRecords = existingRecordsByURI.values.toSet
+    existingRecords.map(_.firstSeenInSitemap).minOption.fold(
+      Future.successful(Map.empty[URI, AvailabilityRecord])
+    ) { earliestMomentOfSitemap =>
+      val timeThreshold = earliestMomentOfSitemap.plus(1, MINUTES)
+      val (neverScannedRecord, missingTimeAndRecord) = existingRecords
+        .filter(record => record.firstSeenInSitemap > timeThreshold && record.needsCheckingNow())
+        .map(record => record.missing.toRight(record).map(_ -> record)).toSeq.separate
 
-    val combined: Set[(URI, Boolean)] =
-      urisForWhichThereIsNoExistingRecord.map(_ -> false) ++ existingRecordsThatNeedCheckingNow.map(_.uri -> true)
+      val mostUrgentUrisAlreadyRecordedAsMissingFromGoogle = missingTimeAndRecord.sortBy(_._1).map(_._2.uri).take(5)
 
-    val throttledList = combined.take(10)
+      val urisMostRecentlyArrivedInSitemapNotYetScanned =
+        neverScannedRecord.sortBy(_.firstSeenInSitemap).reverse.map(_.uri)
 
-    logger.info(Map(
-      "site" -> site.url,
-      "uris.needingChecking" -> combined.size,
-      "uris.toAttempt" -> throttledList.size,
-    ), s"Checking Google index for ${throttledList.size}/${combined.size} sitemap items")
+      val mostUrgentUris =
+        (mostUrgentUrisAlreadyRecordedAsMissingFromGoogle ++ urisMostRecentlyArrivedInSitemapNotYetScanned).take(10)
 
-    Future.traverse(throttledList) { case (uri, hasExistingRecord) =>
-      for {
-        checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(uri, site)
-        updatedAvailabilityRecord <- dataStore.update(uri, hasExistingRecord, checkReport)
-      } yield updatedAvailabilityRecord
-    }.map(_.flatten.map(record => record.uri -> record).toMap)
+      logger.info(Map(
+        "site" -> site.url,
+        "uris.mostUrgentUrisAlreadyRecordedAsMissingFromGoogle" -> mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.size,
+        "uris.mostUrgentUris" -> mostUrgentUris.size,
+      ), s"Checking Google index...")
+
+      Future.traverse(mostUrgentUris) { uri =>
+        for {
+          checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(uri, site)
+          updatedAvailabilityRecord <- dataStore.update(uri, checkReport)
+        } yield updatedAvailabilityRecord
+      }.map(_.flatten.map(record => record.uri -> record).toMap)
+    }
   }
 
   

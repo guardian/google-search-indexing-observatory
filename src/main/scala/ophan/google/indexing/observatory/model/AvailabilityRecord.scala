@@ -14,8 +14,8 @@ import scala.math.Ordering.Implicits._
 case class AvailabilityRecord(
   uri: URI,
   firstSeenInSitemap: Instant,
-  missing: Option[Instant],
-  found: Option[Instant]
+  missing: Option[Instant] = None,
+  found: Option[Instant] = None
 ) {
   val contentHasBeenFound: Boolean = found.nonEmpty
 

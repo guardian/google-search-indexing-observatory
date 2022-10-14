@@ -54,9 +54,9 @@ object Lambda extends Logging {
       println(s"Handing site ${site.url}")
 
       (for {
-        sitemapEntries <- sitemapDownloader.fetchSitemapEntriesFor(site).attemptT
+        sitemapDownload <- sitemapDownloader.fetchSitemapEntriesFor(site).attemptT
         updatedAvailabilityRecords <-
-          EitherT.right[Throwable](availabilityUpdaterService.availabilityFor(sitemapEntries, site))
+          EitherT.right[Throwable](availabilityUpdaterService.availabilityFor(sitemapDownload))
       } yield {
         println(s"Completed site ${site.url}")
         updatedAvailabilityRecords
