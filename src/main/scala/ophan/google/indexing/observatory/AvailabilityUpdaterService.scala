@@ -5,6 +5,8 @@ import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 
 import java.net.URI
+import java.time.Clock.systemUTC
+import java.time.{Clock, Duration}
 import java.time.temporal.ChronoUnit.MINUTES
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
@@ -16,6 +18,8 @@ case class AvailabilityUpdaterService(
 )(implicit
   ec: ExecutionContext
 ) extends Logging {
+
+  val MaxAgeOfUriToScan: Duration = Duration.ofHours(4)
 
   def availabilityFor(sitemapDownload: SitemapDownload): Future[Map[URI, AvailabilityRecord]] = {
     for {
@@ -36,8 +40,9 @@ case class AvailabilityUpdaterService(
   def checkMostUrgentOf(
     existingRecordsByURI: Map[URI, AvailabilityRecord],
     site: Site
-  ): Future[Map[URI, AvailabilityRecord]] = {
-    val existingRecords = existingRecordsByURI.values.toSet
+  )(implicit clock: Clock = systemUTC): Future[Map[URI, AvailabilityRecord]] = {
+    val earliestSitemapTimeToScan = clock.instant().minus(MaxAgeOfUriToScan)
+    val existingRecords = existingRecordsByURI.values.filter(_.firstSeenInSitemap > earliestSitemapTimeToScan).toSet
     val currentlyRecordedMissing = existingRecords.filter(_.currentlyRecordedMissing)
     logger.info(Map(
       "site" -> site.url,
