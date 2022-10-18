@@ -27,7 +27,7 @@ case class AvailabilityRecord(
   val currentlyRecordedMissing: Boolean = latestCheck.exists(!_.wasFound)
 
   def needsCheckingNow()(implicit clock: Clock = Clock.systemUTC): Boolean =
-    !contentHasBeenFound && missing.forall(m => Duration.between(m, clock.instant()) > ofMinutes(3))
+    !contentHasBeenFound && missing.forall(m => Duration.between(m, clock.instant()) > ofMinutes(2))
 }
 
 object AvailabilityRecord {

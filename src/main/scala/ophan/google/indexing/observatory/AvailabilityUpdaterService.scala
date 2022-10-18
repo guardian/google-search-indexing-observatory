@@ -58,13 +58,13 @@ case class AvailabilityUpdaterService(
         .filter(record => record.firstSeenInSitemap > timeThreshold && record.needsCheckingNow())
         .map(record => record.missing.toRight(record).map(_ -> record)).toSeq.separate
 
-      val mostUrgentUrisAlreadyRecordedAsMissingFromGoogle = missingTimeAndRecord.sortBy(_._1).map(_._2.uri).take(10)
+      val mostUrgentUrisAlreadyRecordedAsMissingFromGoogle = missingTimeAndRecord.sortBy(_._1).map(_._2.uri).take(5)
 
       val urisMostRecentlyArrivedInSitemapNotYetScanned =
         neverScannedRecord.sortBy(_.firstSeenInSitemap).reverse.map(_.uri)
 
       val mostUrgentUris =
-        (mostUrgentUrisAlreadyRecordedAsMissingFromGoogle ++ urisMostRecentlyArrivedInSitemapNotYetScanned).take(20)
+        (mostUrgentUrisAlreadyRecordedAsMissingFromGoogle ++ urisMostRecentlyArrivedInSitemapNotYetScanned).take(5)
 
       logger.info(Map(
         "site" -> site.url,
