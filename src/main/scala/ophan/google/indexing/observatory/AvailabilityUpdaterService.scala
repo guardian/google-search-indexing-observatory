@@ -7,6 +7,7 @@ import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 import java.net.URI
 import java.time.temporal.ChronoUnit.MINUTES
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 import scala.math.Ordering.Implicits._
 
 case class AvailabilityUpdaterService(
@@ -37,6 +38,13 @@ case class AvailabilityUpdaterService(
     site: Site
   ): Future[Map[URI, AvailabilityRecord]] = {
     val existingRecords = existingRecordsByURI.values.toSet
+    val currentlyRecordedMissing = existingRecords.filter(_.currentlyRecordedMissing)
+    logger.info(Map(
+      "site" -> site.url,
+      "availabilityRecords.existing" -> existingRecords.size,
+      "availabilityRecords.recordingMissingUris.count" -> currentlyRecordedMissing.size,
+      "availabilityRecords.recordingMissingUris.sample" -> currentlyRecordedMissing.toSeq.sortBy(_.missing).take(3).map(_.uri).asJava,
+    ), s"Checking Google index...")
     existingRecords.map(_.firstSeenInSitemap).minOption.fold(
       Future.successful(Map.empty[URI, AvailabilityRecord])
     ) { earliestMomentOfSitemap =>
@@ -57,7 +65,7 @@ case class AvailabilityUpdaterService(
         "site" -> site.url,
         "uris.mostUrgentUrisAlreadyRecordedAsMissingFromGoogle" -> mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.size,
         "uris.mostUrgentUris" -> mostUrgentUris.size,
-      ), s"Checking Google index...")
+      ), s"Checking Google index... mostUrgentUrisAlreadyRecordedAsMissingFromGoogle=${mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.mkString(", ")}")
 
       Future.traverse(mostUrgentUris) { uri =>
         for {

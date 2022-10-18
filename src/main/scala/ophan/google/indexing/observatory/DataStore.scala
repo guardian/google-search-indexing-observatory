@@ -27,6 +27,7 @@ case class DataStore() extends Logging {
 
   def storeNewRecordsFor(sitemapDownload: SitemapDownload, alreadyKnownUris: Set[URI]): Future[Unit] = {
     val urisNotSeenBefore = sitemapDownload.allUris -- alreadyKnownUris
+    println(s"urisNotSeenBefore=$urisNotSeenBefore site=${sitemapDownload.site}")
     if (urisNotSeenBefore.isEmpty) Future.successful(()) else {
       logger.info(Map(
         "site" -> sitemapDownload.site.url,
