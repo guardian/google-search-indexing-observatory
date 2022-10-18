@@ -65,6 +65,14 @@ object GoogleSearchService {
    * reliably should get this content as one of the top hits. The headline of
    * the article would be one candidate for the value, but the headlines can
    * contain characters that are difficult to escape, eg quotes & double-quotes.
+   *
+   * It seems most reliable to use BOTH the url AND the quoted-path of the url
+   * as the search term. When used by themselves, each term fails for some url:
+   *
+   * * URL-only: Fails to find
+   *   - https://www.nytimes.com/video/middle-east
+   *   - https://www.nytimes.com/interactive/2021/us/martin-indiana-covid-cases.html
+   * * Path-only: Fails to find https://www.theguardian.com/business/live/2022/oct/11/bank-of-england--bond-markets-gilts-uk-unemployment-ifs-spending-cuts-imf-outlook-business-live
    */
-  def reliableSearchTermFor(uri: URI): String = uri.toString
+  def reliableSearchTermFor(uri: URI): String = s"${uri.toString} \"${uri.getPath}\""
 }

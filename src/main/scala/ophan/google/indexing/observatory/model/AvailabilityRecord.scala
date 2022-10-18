@@ -6,7 +6,7 @@ import org.scanamo._
 import org.scanamo.generic.semiauto._
 import org.scanamo.syntax._
 
-import java.time.Duration.ofMinutes
+import java.time.Duration.{ofMinutes, ofSeconds}
 import java.time.temporal.ChronoUnit.SECONDS
 import java.time.format.DateTimeParseException
 import scala.math.Ordering.Implicits._

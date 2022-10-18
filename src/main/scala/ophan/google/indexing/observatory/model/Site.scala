@@ -17,5 +17,8 @@ object Sites {
     sitemaps = Set(new URI("https://www.independent.co.uk/sitemaps/googlenews"))
   )
 
-  val All = Set(NewYorkTimes, Independent)
+  val All = Set(
+    NewYorkTimes
+    //Independent
+  )
 }

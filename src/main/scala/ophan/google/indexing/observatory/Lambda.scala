@@ -24,6 +24,8 @@ import scala.jdk.FutureConverters._
 import cats.data.EitherT
 import cats.implicits._
 
+import scala.util.{Failure, Success}
+
 
 
 
@@ -53,8 +55,13 @@ object Lambda extends Logging {
     val eventual = Future.traverse(Sites.All) { site =>
       println(s"Handing site ${site.url}")
 
+      val sitemapDownloadF = sitemapDownloader.fetchSitemapEntriesFor(site).attemptT
+      sitemapDownloadF.value.onComplete {
+        case Success(Left(e)) => logger.error("Problem getting sitemaps", e)
+        case _ => ()
+      }
       (for {
-        sitemapDownload <- sitemapDownloader.fetchSitemapEntriesFor(site).attemptT
+        sitemapDownload <- sitemapDownloadF
         updatedAvailabilityRecords <-
           EitherT.right[Throwable](availabilityUpdaterService.availabilityFor(sitemapDownload))
       } yield {
