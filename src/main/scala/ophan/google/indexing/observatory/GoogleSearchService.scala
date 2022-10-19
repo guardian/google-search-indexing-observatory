@@ -7,7 +7,7 @@ import com.google.api.services.customsearch.v1.CustomSearchAPI
 import com.google.api.services.customsearch.v1.model.{Result, Search}
 import GoogleSearchService.{reliableSearchTermFor, resultMatches}
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{CheckReport, ContentSummary, Site}
+import ophan.google.indexing.observatory.model.{CheckReport, Site}
 
 import java.net.URI
 import java.time.Instant

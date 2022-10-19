@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import com.madgag.scala.collection.decorators._
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{AvailabilityRecord, ContentSummary, Site, Sites}
+import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site, Sites}
 
 import java.net.URI
 import java.net.http.HttpClient
