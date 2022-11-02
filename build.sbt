@@ -8,7 +8,7 @@ description:= "Checking how long it takes content published by news organisation
 
 version := "1.0"
 
-scalaVersion := "2.13.8"
+scalaVersion := "3.2.0"
 
 scalacOptions ++= Seq(
   "-deprecation",

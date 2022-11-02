@@ -31,10 +31,10 @@ class GoogleSearchService(
     ).setApplicationName("search-index-checker").build()
 
   def contentAvailabilityInGoogleIndex(uri: URI, site: Site): Future[CheckReport] = Future { blocking {
-      val listRequest = search.cse.siterestrict.list()
-        .setKey(apiKey)
-        .setCx(site.searchEngineId) // see https://programmablesearchengine.google.com/controlpanel/all
-        .setQ(reliableSearchTermFor(uri))
+    val listRequest = search.cse.siterestrict.list()
+      .setKey(apiKey)
+      .setCx(site.searchEngineId) // see https://programmablesearchengine.google.com/controlpanel/all
+      .setQ(reliableSearchTermFor(uri))
     val attemptExecute = Try(listRequest.execute())
     if (attemptExecute.isSuccess)
       logger.debug(s"Successful request for ${site.url}")
