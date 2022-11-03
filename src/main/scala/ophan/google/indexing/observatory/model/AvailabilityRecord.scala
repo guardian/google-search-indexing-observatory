@@ -1,17 +1,19 @@
 package ophan.google.indexing.observatory.model
 
+import ophan.google.indexing.observatory.model.AvailabilityRecord.Field.FirstSeenInSitemapDateIndexKey
 import ophan.google.indexing.observatory.model.AvailabilityRecord.{DelayForFirstCheckAfterContentIsFirstSeenInSitemap, reasonableTimeBetweenChecksForContentAged}
 
 import java.net.{URI, URISyntaxException}
-import java.time.{Clock, Duration, Instant}
-import org.scanamo._
-import org.scanamo.generic.semiauto._
-import org.scanamo.syntax._
+import java.time.{Clock, Duration, Instant, LocalDate, ZoneOffset}
+import org.scanamo.*
+import org.scanamo.generic.semiauto.*
+import org.scanamo.syntax.*
 
 import java.time.Duration.{ofMinutes, ofSeconds}
+import java.time.ZoneOffset.UTC
 import java.time.temporal.ChronoUnit.SECONDS
 import java.time.format.DateTimeParseException
-import scala.math.Ordering.Implicits._
+import scala.math.Ordering.Implicits.*
 
 case class CheckStatus(timestamp: Instant, wasFound: Boolean)
 
@@ -40,13 +42,34 @@ case class AvailabilityRecord(
 }
 
 object AvailabilityRecord {
+  
   implicit val uriAsStringFormat: DynamoFormat[URI] =
     DynamoFormat.coercedXmap[URI, String, URISyntaxException](new URI(_), _.toString)
 
   implicit val instantAsISO8601StringFormat: DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, String, DateTimeParseException](Instant.parse, _.truncatedTo(SECONDS).toString)
 
-  implicit val formatAvailabilityRecord: DynamoFormat[AvailabilityRecord] = deriveDynamoFormat
+  implicit class RichDynamoValue(dv: DynamoValue) {
+    def plusObjectEntry(keyValue: (String, String)): DynamoValue = {
+      val (key, value) = keyValue
+      dv.withObject(_.add(key, DynamoValue.fromString(value)).toDynamoValue)
+    }
+  }
+
+  implicit class RichInstant(instant: Instant) {
+    lazy val utcLocalDate: LocalDate = instant.atZone(UTC).toLocalDate
+  }
+  
+  def firstSeenDateKeyFor(firstSeen: Instant): String = s"${firstSeen.utcLocalDate}Z"
+  
+  implicit val formatAvailabilityRecord: DynamoFormat[AvailabilityRecord] = new DynamoFormat[AvailabilityRecord] {
+    private val standard = deriveDynamoFormat[AvailabilityRecord]
+
+    def read(dv: DynamoValue): Either[DynamoReadError, AvailabilityRecord] = standard.read(dv)
+
+    def write(p: AvailabilityRecord): DynamoValue =
+      standard.write(p).plusObjectEntry(FirstSeenInSitemapDateIndexKey -> firstSeenDateKeyFor(p.firstSeenInSitemap))
+  }
 
   /** API cost-saving: I think any content that arrives in Google Search in less than 2 minutes is pretty prompt - we're
    * not  really interested in establishing delay lower than 2 minutes at this point, so it's not worth scanning content
@@ -64,6 +87,8 @@ object AvailabilityRecord {
   object Field {
     val Uri = "uri"
     val FirstSeenInSitemap = "firstSeenInSitemap"
+    val FirstSeenInSitemapDateIndexKey = s"${FirstSeenInSitemap}Date"
+
     def timestampFor(found: Boolean): String = if (found) "found" else "missing"
   }
 }
