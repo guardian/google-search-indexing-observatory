@@ -13,6 +13,7 @@ import scala.jdk.CollectionConverters._
 import scala.math.Ordering.Implicits._
 
 case class AvailabilityUpdaterService(
+  redirectResolver: RedirectResolver,
   dataStore: DataStore,
   googleSearchService: GoogleSearchService
 )(implicit
@@ -24,7 +25,9 @@ case class AvailabilityUpdaterService(
   def availabilityFor(sitemapDownload: SitemapDownload): Future[Map[URI, AvailabilityRecord]] = {
     for {
       existingRecordsByUri <- dataStore.fetchExistingRecordsFor(sitemapDownload.allUris)
-      storageF = dataStore.storeNewRecordsFor(sitemapDownload, existingRecordsByUri.keySet)
+      // New uris must have their redirects resolved & be checked to see that they return HTTP 200 OK, with that info stored in new records
+      // Old uris must be considered for Google Search checks
+      storageF = processNewUris(sitemapDownload, existingRecordsByUri.keySet)
       updatedAvailabilityReports <- checkMostUrgentOf(existingRecordsByUri, sitemapDownload.site)
       _ <- storageF // ...make sure storing new records has completed before we terminate
     } yield {
@@ -36,6 +39,18 @@ case class AvailabilityUpdaterService(
 //      unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports
     }
   }
+
+  // New uris must have their redirects resolved & be checked to see that they return HTTP 200 OK, with that info stored in new records
+  def processNewUris(sitemapDownload: SitemapDownload, initialUrisOfExistingRecords: Set[URI]): Future[_] = {
+    val urisNotSeenBefore = sitemapDownload.allUris -- initialUrisOfExistingRecords
+    for {
+      uriResolutions <- Future.traverse(urisNotSeenBefore)(redirectResolver.resolve)
+      _ <- dataStore.storeNewRecordsFor(sitemapDownload, uriResolutions.collect {
+        case r: Resolution.Resolved => r
+      })
+    } yield ()
+  }
+
 
   def checkMostUrgentOf(
     existingRecordsByURI: Map[URI, AvailabilityRecord],
