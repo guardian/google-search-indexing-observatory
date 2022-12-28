@@ -7,9 +7,9 @@ import Credentials.fetchKeyFromParameterStore
 import java.time.Clock
 import java.time.Clock.systemUTC
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
-import com.madgag.scala.collection.decorators._
+import com.madgag.scala.collection.decorators.*
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site, Sites}
 
@@ -20,9 +20,9 @@ import java.net.http.HttpClient.Version.HTTP_2
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
 import java.time.Duration.ofSeconds
-import scala.jdk.FutureConverters._
+import scala.jdk.FutureConverters.*
 import cats.data.EitherT
-import cats.implicits._
+import cats.implicits.*
 
 import scala.util.{Failure, Success}
 
