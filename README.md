@@ -32,7 +32,7 @@ from [Janus](https://janus.gutools.co.uk/).
 
 ### Running the Lambda locally
 
-Execute this on the command line:
+Execute on the command line:
 
 ```bash
 $ sbt run
