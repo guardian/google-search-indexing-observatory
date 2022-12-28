@@ -9,8 +9,6 @@ class SitemapParserTest extends AnyFlatSpec with Matchers {
 
     val output = SitemapParser.parse(stream, "https://www.independent.co.uk")
 
-    println(output)
-
     output.size shouldBe 200
   }
 }

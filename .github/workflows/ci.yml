@@ -1,16 +1,15 @@
 name: CI
-
 on:
+  workflow_dispatch:
   pull_request:
+  # Triggering CI on default branch improves caching
+  # see https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache
   push:
     branches:
       - main
 
-env:
-  isPrFromForkedRepo: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.owner.login != 'guardian' }}
-
 jobs:
-  CI:
+  test:
     runs-on: ubuntu-latest
 
     # Required by aws-actions/configure-aws-credentials
@@ -19,31 +18,14 @@ jobs:
       contents: read
 
     steps:
-
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Restore and save dependency cache
-        uses: coursier/cache-action@v6
-
-      - name: Set up Java
-        uses: actions/setup-java@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3
         with:
+          distribution: corretto
           java-version: 11
-          distribution: adopt
-
-      - name: Test PR from forked repo
-        if: env.isPrFromForkedRepo == 'true'
-        run: sbt test
-
-        # Required by SBT riffRaffUpload
-      - name: Assume AWS role
-        if: env.isPrFromForkedRepo == 'false'
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
-          aws-region: eu-west-1
-
+          cache: sbt
       - name: CDK
         run: |
           (
@@ -52,10 +34,15 @@ jobs:
             npm test
             npm run synth
           )
-
-      - name: Upload artefacts to Riffraff
-        if: env.isPrFromForkedRepo == 'false'
-        run: >
-          sbt "assembly ;riffRaffUpload"
-          
-
+      - name: Assume AWS role required for Riff-Raff upload
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.GU_RIFF_RAFF_ROLE_ARN }}
+          aws-region: eu-west-1
+      - name: Build, test and upload artifact
+        run: sbt -v "test ;assembly ;riffRaffUpload"
+      - name: Test Summary
+        uses: test-summary/action@v2
+        if: always()
+        with:
+          paths: "test-results/**/TEST-*.xml"

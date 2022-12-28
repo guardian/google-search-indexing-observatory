@@ -4,6 +4,8 @@ target/
 project/boot
 logs/
 
+test-results/
+
 .history
 .DS_Store
 *~
