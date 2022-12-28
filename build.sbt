@@ -15,7 +15,7 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 
-val catsVersion = "2.8.0"
+val catsVersion = "2.9.0"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "upickle" % "2.0.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
-  "com.google.http-client" % "google-http-client-gson" % "1.42.2",
+  "com.google.http-client" % "google-http-client-gson" % "1.42.3",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M23",
   "org.scalatest" %% "scalatest" % "3.2.14" % Test,
@@ -36,6 +36,9 @@ libraryDependencies ++= Seq(
   "com.bnsal" % "sitemap-parser" % "1.0.3"
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
+
+Test / testOptions +=
+  Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}")
 
 enablePlugins(RiffRaffArtifact, BuildInfoPlugin)
 
