@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "com.google.http-client" % "google-http-client-gson" % "1.42.3",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M23",
-  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.15" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
