@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
 
   "com.bnsal" % "sitemap-parser" % "1.0.3"
 
-) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.295")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.19.15")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}")
