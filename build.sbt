@@ -21,21 +21,21 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.0",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.2",
-  "org.slf4j" % "log4j-over-slf4j" % "1.7.36", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.4.1",
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.5", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
+  "ch.qos.logback" % "logback-classic" % "1.4.5",
   "com.lihaoyi" %% "upickle" % "2.0.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.42.3",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20210918-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M23",
-  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.15" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
   "com.bnsal" % "sitemap-parser" % "1.0.3"
 
-) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.251")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.17.295")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}")
