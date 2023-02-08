@@ -2,7 +2,7 @@
 
 _How long does it take for content published by news organisations to be available in Google search?_
 
-This broadens [Ophan's Google Search Index Checker](https://github.com/guardian/ophan-google-search-indexing-observatory)
+This broadens [Ophan's Google Search Index Checker](https://github.com/guardian/ophan-google-search-index-checker)
 to check for content published by _many_ news organisations, not just the Guardian. We're trying to work out if
 the intermittent multi-hour delays we've seen for some Guardian articles to be available in Google Search are
 typical for other news organisations too, or if there's actually something particular to the Guardian that needs
