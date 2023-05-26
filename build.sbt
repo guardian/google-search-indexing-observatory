@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.43.2",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230319-2.0.0",
-  "org.scanamo" %% "scanamo" % "1.0.0-M23",
+  "org.scanamo" %% "scanamo" % "1.0.0-M26",
   "org.scalatest" %% "scalatest" % "3.2.16" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
