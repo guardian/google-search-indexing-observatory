@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "upickle" % "2.0.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
-  "com.google.http-client" % "google-http-client-gson" % "1.42.3",
+  "com.google.http-client" % "google-http-client-gson" % "1.43.2",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230319-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M23",
   "org.scalatest" %% "scalatest" % "3.2.15" % Test,
