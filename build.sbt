@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "net.logstash.logback" % "logstash-logback-encoder" % "7.2",
   "org.slf4j" % "log4j-over-slf4j" % "2.0.6", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
   "ch.qos.logback" % "logback-classic" % "1.4.7",
-  "com.lihaoyi" %% "upickle" % "2.0.0",
+  "com.lihaoyi" %% "upickle" % "3.1.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.43.2",
