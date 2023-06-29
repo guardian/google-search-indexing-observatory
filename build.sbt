@@ -20,13 +20,13 @@ val catsVersion = "2.9.0"
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.2",
-  "net.logstash.logback" % "logstash-logback-encoder" % "7.3",
+  "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
   "org.slf4j" % "log4j-over-slf4j" % "2.0.7", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.4.7",
+  "ch.qos.logback" % "logback-classic" % "1.4.8",
   "com.lihaoyi" %% "upickle" % "3.1.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
-  "com.google.http-client" % "google-http-client-gson" % "1.43.2",
+  "com.google.http-client" % "google-http-client-gson" % "1.43.3",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230319-2.0.0",
   "org.scanamo" %% "scanamo" % "1.0.0-M26",
   "org.scalatest" %% "scalatest" % "3.2.16" % Test,
