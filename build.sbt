@@ -8,28 +8,28 @@ description:= "Checking how long it takes content published by news organisation
 
 version := "1.0"
 
-scalaVersion := "3.3.0"
+scalaVersion := "3.3.1"
 
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8"
 )
 
-val catsVersion = "2.9.0"
+val catsVersion = "2.10.0"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.2",
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.2",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
-  "org.slf4j" % "log4j-over-slf4j" % "2.0.7", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.4.8",
-  "com.lihaoyi" %% "upickle" % "3.1.2",
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.9", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
+  "ch.qos.logback" % "logback-classic" % "1.4.11",
+  "com.lihaoyi" %% "upickle" % "3.1.3",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.43.3",
-  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230319-2.0.0",
-  "org.scanamo" %% "scanamo" % "1.0.0-M26",
-  "org.scalatest" %% "scalatest" % "3.2.16" % Test,
+  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230702-2.0.0",
+  "org.scanamo" %% "scanamo" % "1.0.0-M28",
+  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
