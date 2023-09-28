@@ -27,14 +27,7 @@ case class AvailabilityUpdaterService(
       storageF = dataStore.storeNewRecordsFor(sitemapDownload, existingRecordsByUri.keySet)
       updatedAvailabilityReports <- checkMostUrgentOf(existingRecordsByUri, sitemapDownload.site)
       _ <- storageF // ...make sure storing new records has completed before we terminate
-    } yield {
-//      val unchangedRecordsForContentThatIsKnownToBeFine: Map[URI, AvailabilityRecord] = {
-//        val urisOfContentThatIsKnownToBeFine = existingRecordsThatDoNotNeedCheckingRightNow.map(_.uri)
-//        existingRecordsByUri.view.filterKeys(urisOfContentThatIsKnownToBeFine)
-//      }.toMap
-      updatedAvailabilityReports
-//      unchangedRecordsForContentThatIsKnownToBeFine ++ updatedAvailabilityReports
-    }
+    } yield updatedAvailabilityReports
   }
 
   def checkMostUrgentOf(

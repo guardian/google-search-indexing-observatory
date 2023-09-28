@@ -27,15 +27,13 @@ case class DataStore() extends Logging {
 
   def storeNewRecordsFor(sitemapDownload: SitemapDownload, alreadyKnownUris: Set[URI]): Future[Unit] = {
     val urisNotSeenBefore = sitemapDownload.allUris -- alreadyKnownUris
-    println(s"urisNotSeenBefore=$urisNotSeenBefore site=${sitemapDownload.site}")
-    logger.info(Map(
-      "site" -> sitemapDownload.site.url,
-      "site.sitemap.uris.all" -> sitemapDownload.allUris.size,
-      "site.sitemap.uris.old" -> alreadyKnownUris.size,
-      "site.sitemap.uris.new" -> urisNotSeenBefore.size
-    ), s"Storing ${urisNotSeenBefore.size} new uris for ${sitemapDownload.site.url}")
-    println("I would expect to see that logging new uris")
     if (urisNotSeenBefore.isEmpty) Future.successful(()) else {
+      logger.info(Map(
+        "site" -> sitemapDownload.site.url,
+        "sitemap.uris.all" -> sitemapDownload.allUris.size,
+        "sitemap.uris.old" -> alreadyKnownUris.size,
+        "sitemap.uris.new" -> urisNotSeenBefore.size
+      ), s"Storing ${urisNotSeenBefore.size} new uris for ${sitemapDownload.site.url}. Sample: ${urisNotSeenBefore.take(2).mkString(",")}")
       scanamoAsync.exec(
         table.putAll(urisNotSeenBefore.map(uri => AvailabilityRecord(uri, sitemapDownload.timestamp)))
       )
