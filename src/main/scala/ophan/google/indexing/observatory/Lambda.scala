@@ -40,7 +40,7 @@ object Lambda extends Logging {
 
   val dataStore = new DataStore()
 
-  val availabilityUpdaterService = new AvailabilityUpdaterService(new RedirectResolver(RedirectFollower), dataStore, googleSearchService)
+  val availabilityUpdaterService = new AvailabilityUpdaterService(dataStore, googleSearchService)
 
   // content that we have no 'found' record for - AND have not checked too often/recently
 //  def contentThatNeedsCheckingNowGiven(

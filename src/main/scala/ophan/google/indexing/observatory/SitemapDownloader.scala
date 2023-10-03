@@ -3,7 +3,6 @@ package ophan.google.indexing.observatory
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.Site
 
-import java.io.ByteArrayInputStream
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpClient.Redirect
@@ -13,7 +12,7 @@ import java.net.http.HttpResponse.BodyHandlers
 import java.time.Duration.ofSeconds
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.FutureConverters.*
+import scala.jdk.FutureConverters._
 
 case class SitemapDownload(site: Site, timestamp: Instant, allUris: Set[URI])
 
@@ -26,13 +25,13 @@ class SitemapDownloader(implicit
   def fetchSitemapEntriesFor(site: Site): Future[SitemapDownload] = {
     val start = Instant.now()
     Future.traverse(site.sitemaps) { sitemapUrl =>
-      client.sendAsync(HttpRequest.newBuilder(sitemapUrl).GET().build(), BodyHandlers.ofString()).asScala.map { response =>
+      client.sendAsync(HttpRequest.newBuilder(sitemapUrl).GET().build(), BodyHandlers.ofInputStream()).asScala.map { response =>
         logger.info(Map(
           "site" -> site.url,
           "sitemap.url" -> sitemapUrl,
           "sitemap.response.statusCode" -> response.statusCode()
         ), s"Received HTTP ${response.statusCode()} response for $sitemapUrl sitemap")
-        val uris: Set[URI] = SitemapParser.parse(new ByteArrayInputStream(response.body.getBytes()), site.url)
+        val uris: Set[URI] = SitemapParser.parse(response.body, site.url)
         logger.info(Map(
           "site" -> site.url,
           "sitemap.url" -> sitemapUrl,

@@ -1,11 +1,12 @@
 package ophan.google.indexing.observatory
 
-import ophan.google.indexing.observatory.DataStore.{scanamoAsync, table}
+import DataStore.{scanamoAsync, table}
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.AvailabilityRecord.*
+import ophan.google.indexing.observatory.model.AvailabilityRecord._
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, CheckReport}
-import org.scanamo.*
-import org.scanamo.syntax.*
+import org.scanamo._
+import org.scanamo.syntax._
+import org.scanamo.update.UpdateExpression
 
 import java.net.URI
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,29 +21,24 @@ object DataStore {
 }
 
 case class DataStore() extends Logging {
-  def fetchExistingRecordsFor(uris: Set[URI]): Future[Set[AvailabilityRecord]] = scanamoAsync.exec(
+  def fetchExistingRecordsFor(uris: Set[URI]): Future[Map[URI,AvailabilityRecord]] = scanamoAsync.exec(
     table.getAll(Field.Uri in uris)
-  ).map(_.flatMap(_.toOption))
+  ).map(_.flatMap(_.toOption).map(record => record.uri -> record).toMap)
 
-
-  /**
-   * When we initially store an availability record in the DynamoDB table, we don't store anything about its
-   * availability, just its URL, whether it redirects, and the time we first have seen this url.
-   */
-  def storeNewRecordsFor(sitemapDownload: SitemapDownload, resolutionOfNewUris: Set[Resolution.Resolved]): Future[Unit] = {
-    if (resolutionOfNewUris.isEmpty) Future.successful(()) else {
-      val redirectingUrls = resolutionOfNewUris.filter(_.redirectPath.doesRedirect)
+  def storeNewRecordsFor(sitemapDownload: SitemapDownload, alreadyKnownUris: Set[URI]): Future[Unit] = {
+    val urisNotSeenBefore = sitemapDownload.allUris -- alreadyKnownUris
+    if (urisNotSeenBefore.isEmpty) Future.successful(()) else {
       logger.info(Map(
         "site" -> sitemapDownload.site.url,
         "sitemap.uris.all" -> sitemapDownload.allUris.size,
-      ) ++ contextSampleOf("sitemap.uris.new.resolved", resolutionOfNewUris.map(_.redirectPath.originalUri))
-        ++ contextSampleOf("sitemap.uris.new.resolved.notOK", resolutionOfNewUris.filter(!_.ok).map(_.redirectPath.originalUri))
-        ++ contextSampleOf("sitemap.uris.new.redirecting", redirectingUrls.map(_.redirectPath.originalUri)),
-        s"Storing new uris for ${sitemapDownload.site.url}")
+        "sitemap.uris.old" -> alreadyKnownUris.size,
+        "sitemap.uris.new" -> urisNotSeenBefore.size
+      ), s"Storing ${urisNotSeenBefore.size} new uris for ${sitemapDownload.site.url}. Sample: ${urisNotSeenBefore.take(2).mkString(",")}")
       scanamoAsync.exec(
-        table.putAll(resolutionOfNewUris.map { resolved => AvailabilityRecord(resolved, sitemapDownload.timestamp) })
+        table.putAll(urisNotSeenBefore.map(uri => AvailabilityRecord(uri, sitemapDownload.timestamp)))
       )
     }
+
   }
 
   def update(uri: URI, checkReport: CheckReport): Future[Option[AvailabilityRecord]] = {
