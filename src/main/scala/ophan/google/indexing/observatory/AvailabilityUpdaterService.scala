@@ -1,106 +1,79 @@
 package ophan.google.indexing.observatory
 
-import cats.implicits.*
-import ophan.google.indexing.observatory.AvailabilityUpdaterService.mostUrgent
+import cats.implicits._
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 
 import java.net.URI
 import java.time.Clock.systemUTC
-import java.time.temporal.ChronoUnit.MINUTES
 import java.time.{Clock, Duration}
+import java.time.temporal.ChronoUnit.MINUTES
 import scala.concurrent.{ExecutionContext, Future}
-import scala.math.Ordering.Implicits.*
+import scala.jdk.CollectionConverters._
+import scala.math.Ordering.Implicits._
 
 case class AvailabilityUpdaterService(
-  redirectResolver: RedirectResolver,
   dataStore: DataStore,
   googleSearchService: GoogleSearchService
 )(implicit
   ec: ExecutionContext
 ) extends Logging {
 
-  def availabilityFor(sitemapDownload: SitemapDownload): Future[Set[AvailabilityRecord]] = {
+  val MaxAgeOfUriToScan: Duration = Duration.ofHours(4)
+
+  def availabilityFor(sitemapDownload: SitemapDownload): Future[Map[URI, AvailabilityRecord]] = {
     for {
-      existingRecords <- dataStore.fetchExistingRecordsFor(sitemapDownload.allUris)
-      // New uris must have their redirects resolved & be checked to see that they return HTTP 200 OK, with that info stored in new records
-      // Old uris must be considered for Google Search checks
-      storageF = processNewUris(sitemapDownload, existingRecords)
-      updatedAvailabilityReports <- checkMostUrgentOf(existingRecords)(using sitemapDownload.site)
+      existingRecordsByUri <- dataStore.fetchExistingRecordsFor(sitemapDownload.allUris)
+      storageF = dataStore.storeNewRecordsFor(sitemapDownload, existingRecordsByUri.keySet)
+      updatedAvailabilityReports <- checkMostUrgentOf(existingRecordsByUri, sitemapDownload.site)
       _ <- storageF // ...make sure storing new records has completed before we terminate
     } yield updatedAvailabilityReports
   }
 
-  // New uris must have their redirects resolved & be checked to see that they return HTTP 200 OK, with that info stored in new records
-  def processNewUris(sitemapDownload: SitemapDownload, excludingAlreadyExistingRecords: Set[AvailabilityRecord]): Future[_] = {
-    val urisNotSeenBefore = sitemapDownload.allUris -- excludingAlreadyExistingRecords.map(_.uri)
-    for {
-      redirectResolutionsForUrisNotSeenBefore <- Future.traverse(urisNotSeenBefore)(redirectResolver.resolve)
-      _ <- dataStore.storeNewRecordsFor(sitemapDownload, redirectResolutionsForUrisNotSeenBefore.collect {
-        case r: Resolution.Resolved => r
-      })
-    } yield ()
-  }
-
-  def checkMostUrgentOf(existingRecords: Set[AvailabilityRecord])(using site: Site): Future[Set[AvailabilityRecord]] =
-    checkAndUpdate(mostUrgent(existingRecords))
-
-  private def checkAndUpdate(records: Seq[AvailabilityRecord])(using site: Site): Future[Set[AvailabilityRecord]] = for {
-    updatedAvailabilityRecords <- Future.traverse(records) { availabilityRecord =>
-      for {
-        checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(availabilityRecord.ultimateUri, site)
-        updatedAvailabilityRecord <- dataStore.update(availabilityRecord.uri, checkReport)
-      } yield updatedAvailabilityRecord
-    }
-  } yield {
-    val updatedRecords = updatedAvailabilityRecords.flatten
-    logger.info(Map("site" -> site.url)
-      ++ contextSampleOf("uris.search.checked", records.map(_.uri))
-      ++ contextSampleOf("uris.search.found", updatedRecords.filter(_.contentHasBeenFound).map(_.uri)),
-      s"Checked Google for ${records.size} urls")
-    updatedRecords.toSet
-  }
-}
-
-object AvailabilityUpdaterService extends Logging {
-
-  val MaxAgeOfUriToScan: Duration = Duration.ofHours(4)
-
-  def reduceLoadByDiscardingOldestContent(existingRecordsForUrlsInSitemap: Set[AvailabilityRecord])(using clock: Clock = systemUTC()): Set[AvailabilityRecord] = {
-    if (existingRecordsForUrlsInSitemap.size < 10) existingRecordsForUrlsInSitemap
-    else {
-      val recencyThreshold = clock.instant().minus(MaxAgeOfUriToScan) // don't scan really old stuff
-
-      // don't scan THE VERY EARLIEST items - who knows how long they had been published before we turned on scanning?
-      val earliestItemsThreshold =
-        existingRecordsForUrlsInSitemap.map(_.firstSeenInSitemap).minOption.map(_.plus(1, MINUTES))
-
-      val timeThreshold = (Set(recencyThreshold) ++ earliestItemsThreshold).max
-
-      existingRecordsForUrlsInSitemap.filter(_.firstSeenInSitemap > timeThreshold)
-    }
-  }
-
-  def mostUrgent(existingRecords: Set[AvailabilityRecord])(using site: Site): Seq[AvailabilityRecord] = {
-    val recordsNeedingCheck = reduceLoadByDiscardingOldestContent(existingRecords).filter(_.needsCheckingNow())
-
-    val (neverScannedRecords, missingTimesAndRecords) =
-      recordsNeedingCheck.map(record => record.missing.toRight(record).map(_ -> record)).toSeq.separate
-
-    val mostUrgentUrisAlreadyRecordedAsMissingFromGoogle = missingTimesAndRecords.sortBy(_._1).map(_._2)
-
-    val urisMostRecentlyArrivedInSitemapNotYetScanned = neverScannedRecords.sortBy(_.firstSeenInSitemap).reverse
-
-    val recordsToCheck =
-      (mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.take(5) ++ urisMostRecentlyArrivedInSitemapNotYetScanned).take(5)
-
+  def checkMostUrgentOf(
+    existingRecordsByURI: Map[URI, AvailabilityRecord],
+    site: Site
+  )(implicit clock: Clock = systemUTC): Future[Map[URI, AvailabilityRecord]] = {
+    val earliestSitemapTimeToScan = clock.instant().minus(MaxAgeOfUriToScan)
+    val existingRecords = existingRecordsByURI.values.filter(_.firstSeenInSitemap > earliestSitemapTimeToScan).toSet
+    val currentlyRecordedMissing = existingRecords.filter(_.currentlyRecordedMissing)
     logger.info(Map(
       "site" -> site.url,
-    ) ++ contextSampleOf("uris.existingRecords", existingRecords.map(_.uri))
-      ++ contextSampleOf("uris.recordsNeedingCheck", recordsNeedingCheck.map(_.uri))
-      ++ contextSampleOf("uris.mostUrgent.alreadyRecordedAsMissingFromGoogle", mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.map(_.uri))
-      ++ contextSampleOf("uris.mostUrgent.selectedForCheck", recordsToCheck.map(_.uri)),
-      s"Identified most urgent records")
-    recordsToCheck
+      "availabilityRecords.existing" -> existingRecords.size,
+      "availabilityRecords.recordingMissingUris.count" -> currentlyRecordedMissing.size,
+      "availabilityRecords.recordingMissingUris.sample" -> currentlyRecordedMissing.toSeq.sortBy(_.missing).take(3).map(_.uri).asJava,
+    ), s"Checking Google index...")
+    existingRecords.map(_.firstSeenInSitemap).minOption.fold(
+      Future.successful(Map.empty[URI, AvailabilityRecord])
+    ) { earliestMomentOfSitemap =>
+      val timeThreshold = earliestMomentOfSitemap.plus(1, MINUTES)
+      val (neverScannedRecord, missingTimeAndRecord) = existingRecords
+        .filter(record => record.firstSeenInSitemap > timeThreshold && record.needsCheckingNow())
+        .map(record => record.missing.toRight(record).map(_ -> record)).toSeq.separate
+
+      val mostUrgentUrisAlreadyRecordedAsMissingFromGoogle = missingTimeAndRecord.sortBy(_._1).map(_._2.uri).take(5)
+
+      val urisMostRecentlyArrivedInSitemapNotYetScanned =
+        neverScannedRecord.sortBy(_.firstSeenInSitemap).reverse.map(_.uri)
+
+      val mostUrgentUris =
+        (mostUrgentUrisAlreadyRecordedAsMissingFromGoogle ++ urisMostRecentlyArrivedInSitemapNotYetScanned).take(5)
+
+      logger.info(Map(
+        "site" -> site.url,
+        "uris.mostUrgentUrisAlreadyRecordedAsMissingFromGoogle" -> mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.size,
+        "uris.mostUrgentUris" -> mostUrgentUris.size,
+      ), s"Checking Google index... mostUrgentUrisAlreadyRecordedAsMissingFromGoogle=${mostUrgentUrisAlreadyRecordedAsMissingFromGoogle.mkString(", ")}")
+
+      Future.traverse(mostUrgentUris) { uri =>
+        for {
+          checkReport <- googleSearchService.contentAvailabilityInGoogleIndex(uri, site)
+          updatedAvailabilityRecord <- dataStore.update(uri, checkReport)
+        } yield updatedAvailabilityRecord
+      }.map(_.flatten.map(record => record.uri -> record).toMap)
+    }
   }
+
+  
+
 }

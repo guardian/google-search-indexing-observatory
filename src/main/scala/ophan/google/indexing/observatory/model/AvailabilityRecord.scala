@@ -1,6 +1,5 @@
 package ophan.google.indexing.observatory.model
 
-import ophan.google.indexing.observatory.Resolution
 import ophan.google.indexing.observatory.model.AvailabilityRecord.Field.FirstSeenInSitemapDateIndexKey
 import ophan.google.indexing.observatory.model.AvailabilityRecord.{DelayForFirstCheckAfterContentIsFirstSeenInSitemap, reasonableTimeBetweenChecksForContentAged}
 
@@ -18,24 +17,12 @@ import scala.math.Ordering.Implicits.*
 
 case class CheckStatus(timestamp: Instant, wasFound: Boolean)
 
-// Resolved URI? Was page HTTP 200 OK?
-// Want to know if we should:
-// a) ignore this page, as it was not OK - 404 or redirected too much
-// b) scan an alternate url - a page which we were redirected to, which was ok
-// c) scan darn url.
-
-// pageResolvedOk
-// uriAfterRedirects
 case class AvailabilityRecord(
   uri: URI,
-  finalUriAfterRedirects: Option[URI],
-  uriResolvedOk: Boolean,
   firstSeenInSitemap: Instant,
   missing: Option[Instant] = None,
   found: Option[Instant] = None
 ) {
-  val ultimateUri: URI = finalUriAfterRedirects.getOrElse(uri)
-  
   val latestCheck: Option[CheckStatus] = (
     missing.map(CheckStatus(_, wasFound = false)) ++ found.map(CheckStatus(_, wasFound = true))
   ).toSeq.maxByOption(_.timestamp)
@@ -43,23 +30,18 @@ case class AvailabilityRecord(
   val contentHasBeenFound: Boolean = latestCheck.exists(_.wasFound)
   val currentlyRecordedMissing: Boolean = latestCheck.exists(!_.wasFound)
 
-  def needsCheckingNow()(implicit clock: Clock = Clock.systemUTC): Boolean = !contentHasBeenFound && {
-    val now = clock.instant()
-    val timeSinceFirstSeenInSitemap = Duration.between(firstSeenInSitemap, now)
-    timeSinceFirstSeenInSitemap > DelayForFirstCheckAfterContentIsFirstSeenInSitemap && missing.forall { m =>
-      Duration.between(m, now) > reasonableTimeBetweenChecksForContentAged(timeSinceFirstSeenInSitemap)
+  def needsCheckingNow()(implicit clock: Clock = Clock.systemUTC): Boolean = {
+    !contentHasBeenFound && {
+      val now = clock.instant()
+      val timeSinceFirstSeenInSitemap = Duration.between(firstSeenInSitemap, now)
+      timeSinceFirstSeenInSitemap > DelayForFirstCheckAfterContentIsFirstSeenInSitemap && missing.forall { m =>
+        Duration.between(m, now) > reasonableTimeBetweenChecksForContentAged(timeSinceFirstSeenInSitemap)
+      }
     }
   }
 }
 
 object AvailabilityRecord {
-
-  def apply(resolved: Resolution.Resolved, firstSeenInSitemap: Instant): AvailabilityRecord = AvailabilityRecord(
-    uri = resolved.redirectPath.locations.head,
-    uriResolvedOk = resolved.ok,
-    finalUriAfterRedirects = resolved.redirectPath.locations.tail.lastOption,
-    firstSeenInSitemap = firstSeenInSitemap
-  )
   
   implicit val uriAsStringFormat: DynamoFormat[URI] =
     DynamoFormat.coercedXmap[URI, String, URISyntaxException](new URI(_), _.toString)

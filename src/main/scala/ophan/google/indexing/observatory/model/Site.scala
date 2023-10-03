@@ -8,7 +8,7 @@ object Sites {
   val NewYorkTimes = Site(
     url="https://www.nytimes.com/",
     searchEngineId="70f791f05cbda4a5c",
-    sitemaps=Set(new URI("https://www.nytimes.com/sitemaps/new/news.xml.gz"))
+    sitemaps=Set(new URI("https://www.nytimes.com/sitemaps/new/news-1.xml.gz"))
   )
 
 // The Independent appear to change/evolve their URLs often, leaving them in the sitemap with
