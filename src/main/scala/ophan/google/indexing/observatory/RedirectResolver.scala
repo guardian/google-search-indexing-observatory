@@ -1,22 +1,17 @@
 package ophan.google.indexing.observatory
 
 import com.github.blemale.scaffeine.{AsyncLoadingCache, Scaffeine}
+import okhttp3.{Headers, OkHttpClient, Request}
 import ophan.google.indexing.observatory.Resolution.{Resolved, Unresolved}
 import ophan.google.indexing.observatory.logging.Logging
 
 import java.net.URI
 import java.net.http.*
-import java.net.http.HttpClient.Redirect
-import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.HttpRequest.BodyPublishers.noBody
-import java.net.http.HttpResponse.BodyHandlers
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.duration.*
-import scala.jdk.FutureConverters.*
-import scala.jdk.OptionConverters.*
+import scala.concurrent.{Future, blocking}
 import scala.util.Try
 
 case class RedirectPath(locations: Seq[URI]) {
@@ -60,32 +55,40 @@ object RedirectFollower extends RedirectFollower with Logging {
 
   val HTTPRedirectStatusCodes: Set[Int] = Set(301, 302, 303, 307, 308)
 
-  def redirectGivenBy(requestUri: URI, response: HttpResponse[_]): Option[URI] =
-    if (HTTPRedirectStatusCodes.contains(response.statusCode)) getRedirectedURI(requestUri, response.headers) else None
+  def redirectGivenBy(requestUri: URI, response: okhttp3.Response): Option[URI] =
+    if (HTTPRedirectStatusCodes.contains(response.code())) getRedirectedURI(requestUri, response.headers()) else None
 
   // based on https://github.com/openjdk/jdk17/blob/4afbcaf55/src/java.net.http/share/classes/jdk/internal/net/http/RedirectFilter.java#L132
-  private def getRedirectedURI(requestUri: URI, headers: HttpHeaders): Option[URI] =
+  private def getRedirectedURI(requestUri: URI, headers: Headers): Option[URI] =
     headers.location.flatMap { newLocation =>
       Try(URI.create(newLocation)).toOption
     }.map(requestUri.resolve) // redirect could be relative to original URL
 
 
-  extension (headers: HttpHeaders) def location: Option[String] = headers.firstValue("Location").toScala
+  extension (headers: Headers) def location: Option[String] = Option(headers.get("Location"))
 
-  private val httpClient: HttpClient = HttpClient.newBuilder()
-    .followRedirects(Redirect.NEVER)
-    .connectTimeout(ofSeconds(2))
-    .build()
+  private val httpClient: OkHttpClient =
+    new OkHttpClient.Builder()
+      .followRedirects(false)
+      .followSslRedirects(false)
+      .callTimeout(Duration.ofSeconds(2))
+      .readTimeout(Duration.ofSeconds(2))
+      .build()
 
-  def requestFor(uri: URI): HttpRequest =
-    HttpRequest.newBuilder().uri(uri).timeout(ofSeconds(2))
-      .header("User-Agent", "curl/7.54") // NYT accepts curl, but rejects the default "Java-http-client" User-Agent!
-      .method("HEAD", noBody()).build()
+  def requestFor(uri: URI): Request =
+    new Request.Builder()
+      .url(uri.toURL)
+      .head()
+      .header("User-Agent", "curl/7.54")
+      .build();
 
-
-  def follow(uri: URI): Future[Resp] = httpClient.sendAsync(requestFor(uri), BodyHandlers.discarding()).asScala.map {
+  def follow(uri: URI): Future[Resp] = Future {
+    blocking {
+      httpClient.newCall(requestFor(uri)).execute()
+    }
+  }.map {
     response => redirectGivenBy(uri, response).toRight {
-      val statusCode = response.statusCode
+      val statusCode = response.code()
       val responseOk = statusCode == 200
       if (!responseOk) {
         logger.warn(Map(

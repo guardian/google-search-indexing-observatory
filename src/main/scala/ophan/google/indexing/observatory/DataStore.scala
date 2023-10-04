@@ -30,18 +30,18 @@ case class DataStore() extends Logging {
    * When we initially store an availability record in the DynamoDB table, we don't store anything about its
    * availability, just its URL, whether it redirects, and the time we first have seen this url.
    */
-  def storeNewRecordsFor(sitemapDownload: SitemapDownload, urisNotSeenBefore: Set[URI]): Future[Unit] = {
-    if (urisNotSeenBefore.isEmpty) Future.successful(()) else {
+  def storeNewRecordsFor(sitemapDownload: SitemapDownload, resolutionOfNewUris: Set[Resolution.Resolved]): Future[Unit] = {
+    if (resolutionOfNewUris.isEmpty) Future.successful(()) else {
+      val redirectingUrls = resolutionOfNewUris.filter(_.redirectPath.doesRedirect)
       logger.info(Map(
         "site" -> sitemapDownload.site.url,
         "sitemap.uris.all" -> sitemapDownload.allUris.size,
-      ) ++ contextSampleOf("sitemap.uris.urisNotSeenBefore", urisNotSeenBefore),
+      ) ++ contextSampleOf("sitemap.uris.new.resolved", resolutionOfNewUris.map(_.redirectPath.originalUri))
+        ++ contextSampleOf("sitemap.uris.new.resolved.notOK", resolutionOfNewUris.filter(!_.ok).map(_.redirectPath.originalUri))
+        ++ contextSampleOf("sitemap.uris.new.redirecting", redirectingUrls.map(_.redirectPath.originalUri)),
         s"Storing new uris for ${sitemapDownload.site.url}")
       scanamoAsync.exec(
-        table.putAll(urisNotSeenBefore.map { uri =>
-          val skippedResolution: Resolved = Resolution.Resolved(RedirectPath(Seq(uri)), false)
-          AvailabilityRecord(skippedResolution, sitemapDownload.timestamp)
-        })
+        table.putAll(resolutionOfNewUris.map { resolved => AvailabilityRecord(resolved, sitemapDownload.timestamp) })
       )
     }
   }

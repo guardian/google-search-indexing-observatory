@@ -2,6 +2,7 @@ package ophan.google.indexing.observatory
 
 import cats.implicits.*
 import ophan.google.indexing.observatory.AvailabilityUpdaterService.mostUrgent
+import ophan.google.indexing.observatory.Resolution.Resolved
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 
@@ -35,8 +36,10 @@ case class AvailabilityUpdaterService(
   def processNewUris(sitemapDownload: SitemapDownload, excludingAlreadyExistingRecords: Set[AvailabilityRecord]): Future[_] = {
     val urisNotSeenBefore = sitemapDownload.allUris -- excludingAlreadyExistingRecords.map(_.uri)
     for {
-      // redirectResolutionsForUrisNotSeenBefore <- Future.traverse(urisNotSeenBefore)(redirectResolver.resolve)
-      _ <- dataStore.storeNewRecordsFor(sitemapDownload, urisNotSeenBefore)
+      redirectResolutionsForUrisNotSeenBefore <- Future.traverse(urisNotSeenBefore)(redirectResolver.resolve)
+      _ <- dataStore.storeNewRecordsFor(sitemapDownload, redirectResolutionsForUrisNotSeenBefore.collect {
+        case r: Resolved => r
+      })
     } yield ()
   }
 
