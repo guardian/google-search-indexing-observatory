@@ -33,7 +33,10 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
-  "com.bnsal" % "sitemap-parser" % "1.0.3"
+  "com.bnsal" % "sitemap-parser" % "1.0.3",
+  "org.typelevel" %% "literally" % "1.1.0" % Test,
+
+  "com.github.blemale" %% "scaffeine" % "5.2.1"
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.20.150")
 

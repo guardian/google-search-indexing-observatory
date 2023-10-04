@@ -27,8 +27,6 @@ import cats.implicits.*
 import scala.util.{Failure, Success}
 
 
-
-
 object Lambda extends Logging {
 
   val sitemapDownloader = new SitemapDownloader()
@@ -40,13 +38,8 @@ object Lambda extends Logging {
 
   val dataStore = new DataStore()
 
-  val availabilityUpdaterService = new AvailabilityUpdaterService(dataStore, googleSearchService)
-
-  // content that we have no 'found' record for - AND have not checked too often/recently
-//  def contentThatNeedsCheckingNowGiven(
-//    existingRecordsByCapiId: Map[String,AvailabilityRecord]
-//  )(content: ContentSummary)(implicit clock:Clock = systemUTC): Boolean =
-//    existingRecordsByCapiId.get(content.id).forall(content.shouldBeCheckedNowGivenExisting)
+  private val redirectResolver = new RedirectResolver(RedirectFollower)
+  val availabilityUpdaterService = new AvailabilityUpdaterService(redirectResolver, dataStore, googleSearchService)
 
   /*
    * Logic handler
@@ -73,29 +66,14 @@ object Lambda extends Logging {
     Await.result(eventual, 40.seconds)
     println("Everything complete")
 
-
-
-    //    val eventual = for {
-//      contentSummaries <- recentContentService.fetchRecentContent()
-//      availability <- availabilityFor(contentSummaries.toSet)
-//    } yield {
-//      println("Mostly done!")
-//      val allWorryinglyAbsentContent = availability.values.filter(_.contentIsCurrentlyWorryinglyAbsentFromGoogle())
-//      //println(f"Missing from Google index: ${100f*allWorryinglyAbsentContent.size/successfulIndexStateChecks}%.1f%%")
-//      for {
-//        worryinglyAbsentContent <- allWorryinglyAbsentContent.toSeq.sortBy(_.contentSummary.firstPublished)
-//      } {
-//        val content = worryinglyAbsentContent.contentSummary
-//        println(s"${content.timeSinceUrlWentPublic().toMinutes}mins ${content.ophanUrl}\n${content.googleSearchUiUrl}\n")
-//      }
-//      // checkReports
-//    }
-
-//    Await.result(eventual , 10.seconds)
+    Await.ready({
+      val eventualResolution = redirectResolver.resolve(URI.create("https://www.bbc.co.uk/news/uk-politics-63534039"))
+      eventualResolution.foreach { resolution =>
+        logger.info(s"BBC url resolved to $resolution")
+      }
+      eventualResolution
+    }, 10.seconds)
   }
-
-
-
 
   /*
    * Lambda's entry point
@@ -103,5 +81,4 @@ object Lambda extends Logging {
   def handler(lambdaInput: ScheduledEvent, context: Context): Unit = {
     go()
   }
-
 }
