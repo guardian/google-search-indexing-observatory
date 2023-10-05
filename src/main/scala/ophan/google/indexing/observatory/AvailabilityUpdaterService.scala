@@ -37,9 +37,7 @@ case class AvailabilityUpdaterService(
     val urisNotSeenBefore = sitemapDownload.allUris -- excludingAlreadyExistingRecords.map(_.uri)
     for {
       redirectResolutionsForUrisNotSeenBefore <- Future.traverse(urisNotSeenBefore)(redirectResolver.resolve)
-      _ <- dataStore.storeNewRecordsFor(sitemapDownload, redirectResolutionsForUrisNotSeenBefore.collect {
-        case r: Resolved => r
-      })
+      _ <- dataStore.storeNewRecordsFor(sitemapDownload, redirectResolutionsForUrisNotSeenBefore)
     } yield ()
   }
 

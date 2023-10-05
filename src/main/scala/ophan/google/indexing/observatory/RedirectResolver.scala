@@ -6,7 +6,6 @@ import ophan.google.indexing.observatory.Resolution.{Resolved, Unresolved}
 import ophan.google.indexing.observatory.logging.Logging
 
 import java.net.URI
-import java.net.http.*
 import java.time.Duration
 import java.time.Duration.ofSeconds
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -71,8 +70,7 @@ object RedirectFollower extends RedirectFollower with Logging {
     new OkHttpClient.Builder()
       .followRedirects(false)
       .followSslRedirects(false)
-      .callTimeout(Duration.ofSeconds(2))
-      .readTimeout(Duration.ofSeconds(2))
+      .callTimeout(Duration.ofSeconds(5))
       .build()
 
   def requestFor(uri: URI): Request =
