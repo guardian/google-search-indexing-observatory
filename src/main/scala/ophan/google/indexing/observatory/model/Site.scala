@@ -22,7 +22,7 @@ object Sites {
   )
 
   val BBC = Site(
-    url = "https://www.bbc.co.uk",
+    url = "https://www.bbc.co.uk/",
     searchEngineId = "b44c6a8d0e79b43bb",
     sitemaps = Set(
       new URI("https://www.bbc.co.uk/sitemaps/https-sitemap-uk-news-1.xml"),
@@ -31,7 +31,7 @@ object Sites {
   )
 
   val DailyMail= Site(
-    url = "https://www.dailymail.co.uk",
+    url = "https://www.dailymail.co.uk/",
     searchEngineId = "e42e842597f034061",
     sitemaps = Set(new URI("https://www.dailymail.co.uk/google-news-sitemap1.xml"))
   )

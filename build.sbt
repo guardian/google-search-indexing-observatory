@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "log4j-over-slf4j" % "2.0.9", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
   "ch.qos.logback" % "logback-classic" % "1.4.11",
   "com.lihaoyi" %% "upickle" % "3.1.3",
+  "com.squareup.okhttp3" % "okhttp" % "4.10.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "com.google.http-client" % "google-http-client-gson" % "1.43.3",
@@ -41,7 +42,7 @@ libraryDependencies ++= Seq(
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.20.150")
 
 Test / testOptions +=
-  Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}")
+  Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
 
 enablePlugins(RiffRaffArtifact, BuildInfoPlugin)
 

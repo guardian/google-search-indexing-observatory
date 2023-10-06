@@ -65,14 +65,6 @@ object Lambda extends Logging {
 
     Await.result(eventual, 40.seconds)
     println("Everything complete")
-
-    Await.ready({
-      val eventualResolution = redirectResolver.resolve(URI.create("https://www.bbc.co.uk/news/uk-politics-63534039"))
-      eventualResolution.foreach { resolution =>
-        logger.info(s"BBC url resolved to $resolution")
-      }
-      eventualResolution
-    }, 10.seconds)
   }
 
   /*
