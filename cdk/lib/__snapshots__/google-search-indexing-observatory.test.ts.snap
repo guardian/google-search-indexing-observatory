@@ -38,6 +38,10 @@ Object {
         },
         "Tags": Array [
           Object {
+            "Key": "devx-backup-enabled",
+            "Value": "true",
+          },
+          Object {
             "Key": "gu:cdk:version",
             "Value": "TEST",
           },
