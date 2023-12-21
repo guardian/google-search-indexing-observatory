@@ -5,7 +5,11 @@ import { GoogleSearchIndexingObservatory } from "./google-search-indexing-observ
 describe("The GoogleSearchIndexingObservatory stack", () => {
   it("matches the snapshot", () => {
     const app = new App();
-    const stack = new GoogleSearchIndexingObservatory(app, "GoogleSearchIndexingObservatory", { stack: "ophan", stage: "TEST" });
+    const stack = new GoogleSearchIndexingObservatory(app, "GoogleSearchIndexingObservatory", {
+      stack: "ophan",
+      stage: "TEST",
+      withBackup: true,
+    });
     const template = Template.fromStack(stack);
     expect(template.toJSON()).toMatchSnapshot();
   });
