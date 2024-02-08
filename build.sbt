@@ -21,16 +21,16 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.3",
   "com.amazonaws" % "aws-lambda-java-events" % "3.11.4",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
-  "org.slf4j" % "log4j-over-slf4j" % "2.0.9", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.4.11",
-  "com.lihaoyi" %% "upickle" % "3.1.3",
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.12", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
+  "ch.qos.logback" % "logback-classic" % "1.4.14",
+  "com.lihaoyi" %% "upickle" % "3.1.4",
   "com.squareup.okhttp3" % "okhttp" % "4.12.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
-  "com.google.http-client" % "google-http-client-gson" % "1.43.3",
-  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20230702-2.0.0",
-  "org.scanamo" %% "scanamo" % "1.0.0-M28",
-  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
+  "com.google.http-client" % "google-http-client-gson" % "1.44.1",
+  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20240103-2.0.0",
+  "org.scanamo" %% "scanamo" % "1.0.0-M30",
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
