@@ -1,6 +1,6 @@
 package ophan.google.indexing.observatory.model
 
-import ophan.google.indexing.observatory.{RedirectPath, Resolution}
+import com.gu.http.redirect.resolver.{Conclusion, RedirectPath, Resolution}
 import ophan.google.indexing.observatory.literals.uri
 import ophan.google.indexing.observatory.model.AvailabilityRecord.Field.FirstSeenInSitemapDateIndexKey
 import ophan.google.indexing.observatory.model.AvailabilityRecord.{DelayForFirstCheckAfterContentIsFirstSeenInSitemap, reasonableTimeBetweenChecksForContentAged}
@@ -9,7 +9,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scanamo.{DynamoObject, DynamoValue}
-import ophan.google.indexing.observatory.Resolution.Resolved
 
 import java.net.URI
 import java.time.{Duration, Instant}
@@ -69,7 +68,7 @@ class AvailabilityRecordTest extends AnyFlatSpec with Matchers with OptionValues
     val resolved: Resolution.Resolved = Resolution.Resolved(RedirectPath(Seq(
       uri"https://www.bbc.co.uk/news/uk-politics-63534039",
       uri"https://www.bbc.co.uk/news/av/uk-politics-63534039"
-    )), ok = true)
+    )), Conclusion.Ok)
 
     val availabilityRecord: AvailabilityRecord = AvailabilityRecord(resolved, Instant.parse("2022-12-05T20:10:34Z"))
 

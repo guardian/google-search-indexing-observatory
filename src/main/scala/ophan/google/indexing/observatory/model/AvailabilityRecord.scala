@@ -1,6 +1,6 @@
 package ophan.google.indexing.observatory.model
 
-import ophan.google.indexing.observatory.Resolution
+import com.gu.http.redirect.resolver.Resolution
 import ophan.google.indexing.observatory.model.AvailabilityRecord.Field.FirstSeenInSitemapDateIndexKey
 import ophan.google.indexing.observatory.model.AvailabilityRecord.{DelayForFirstCheckAfterContentIsFirstSeenInSitemap, reasonableTimeBetweenChecksForContentAged}
 
@@ -55,8 +55,8 @@ case class AvailabilityRecord(
 object AvailabilityRecord {
 
   def apply(resolved: Resolution.Resolved, firstSeenInSitemap: Instant): AvailabilityRecord = AvailabilityRecord(
-    uri = resolved.redirectPath.locations.head,
-    uriResolvedOk = resolved.ok,
+    uri = resolved.redirectPath.originalUri,
+    uriResolvedOk = resolved.conclusion.isOk,
     finalUriAfterRedirects = resolved.redirectPath.locations.tail.lastOption,
     firstSeenInSitemap = firstSeenInSitemap
   )
