@@ -23,6 +23,7 @@ import java.time.Duration.ofSeconds
 import scala.jdk.FutureConverters.*
 import cats.data.EitherT
 import cats.implicits.*
+import com.gu.http.redirect.resolver.UrlResolver
 
 import scala.util.{Failure, Success}
 
@@ -38,7 +39,7 @@ object Lambda extends Logging {
 
   val dataStore = new DataStore()
 
-  private val redirectResolver = new RedirectResolver(RedirectFollower)
+  private val redirectResolver = new UrlResolver(RedirectFollower)
   val availabilityUpdaterService = new AvailabilityUpdaterService(redirectResolver, dataStore, googleSearchService)
 
   /*

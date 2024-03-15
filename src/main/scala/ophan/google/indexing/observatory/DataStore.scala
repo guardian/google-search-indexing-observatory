@@ -1,7 +1,8 @@
 package ophan.google.indexing.observatory
 
+import com.gu.http.redirect.resolver.Resolution
+import com.gu.http.redirect.resolver.Resolution.{Resolved, Unresolved}
 import ophan.google.indexing.observatory.DataStore.{scanamoAsync, table}
-import ophan.google.indexing.observatory.Resolution.{Resolved, Unresolved}
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.AvailabilityRecord.*
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, CheckReport}
@@ -40,7 +41,7 @@ case class DataStore() extends Logging {
       "sitemap.uris.all" -> sitemapDownload.allUris.size,
     ) ++ logContextFor("unresolved", resolutionsForUrisNotSeenBefore.collect { case u: Unresolved => u})
       ++ logContextFor("resolved", resolvedNewUris)
-      ++ logContextFor("resolved.notOK", resolvedNewUris.filter(!_.ok))
+      ++ logContextFor("resolved.notOK", resolvedNewUris.filter(!_.conclusion.isOk))
       ++ logContextFor("resolved.redirecting", resolvedNewUris.filter(_.redirectPath.doesRedirect)),
       s"Storing ${resolvedNewUris.size} new resolved uris for ${sitemapDownload.site.url}")
 

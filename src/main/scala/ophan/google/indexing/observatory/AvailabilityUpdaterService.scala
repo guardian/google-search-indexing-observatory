@@ -1,8 +1,8 @@
 package ophan.google.indexing.observatory
 
 import cats.implicits.*
+import com.gu.http.redirect.resolver.UrlResolver
 import ophan.google.indexing.observatory.AvailabilityUpdaterService.mostUrgent
-import ophan.google.indexing.observatory.Resolution.Resolved
 import ophan.google.indexing.observatory.logging.Logging
 import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site}
 
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Ordering.Implicits.*
 
 case class AvailabilityUpdaterService(
-  redirectResolver: RedirectResolver,
+  redirectResolver: UrlResolver,
   dataStore: DataStore,
   googleSearchService: GoogleSearchService
 )(implicit
