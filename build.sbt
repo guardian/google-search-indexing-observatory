@@ -40,7 +40,7 @@ libraryDependencies ++= Seq(
   "com.github.blemale" %% "scaffeine" % "5.2.1",
   "com.gu" %% "redirect-resolver" % "0.0.35"
 
-) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.23.21")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.25.28")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
