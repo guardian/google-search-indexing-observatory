@@ -33,8 +33,8 @@ object Lambda extends Logging {
   val sitemapDownloader = new SitemapDownloader()
 
   val googleSearchService: GoogleSearchService = {
-    val apiKey = fetchKeyFromParameterStore("Google/CustomSearch/ApiKey")
-    new GoogleSearchService(apiKey)
+    val apiKey = fetchKeyFromParameterStore("Google/VertexAISearch/ApiKeyNotEncrypted")
+    new GoogleSearchService(apiKey, "ophan-reborn-2017", "global")
   }
 
   val dataStore = new DataStore()
