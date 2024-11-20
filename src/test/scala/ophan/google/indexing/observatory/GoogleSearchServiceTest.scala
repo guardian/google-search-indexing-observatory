@@ -1,6 +1,5 @@
 package ophan.google.indexing.observatory
 
-import com.google.api.services.customsearch.v1.model.Result
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -12,9 +11,24 @@ class GoogleSearchServiceTest extends AnyFlatSpec with Matchers {
       "https://www.theguardian.com/food/2022/sep/15/korean-hotdogs-k-dogs-sausage-cheese-fast-food?utm_term=Autofeed&CMP=twt_gu&utm_medium&utm_source=Twitter"
 
     val canonicalPageUrl = URI.create("https://www.theguardian.com/food/2022/sep/15/korean-hotdogs-k-dogs-sausage-cheese-fast-food")
-    GoogleSearchService.resultMatches(canonicalPageUrl, resultWithLink(googleResultLink)) shouldBe true
+    GoogleSearchService.resultMatches(canonicalPageUrl, SearchResult(Document(DerivedStructData(googleResultLink)))) shouldBe true
   }
 
+  it should "handle URLs with special characters" in {
+    val googleResultLink = "https://www.theguardian.com/food/2023/may/15/café-review"
+    val canonicalPageUrl = URI.create("https://www.theguardian.com/food/2023/may/15/café-review")
+    GoogleSearchService.resultMatches(canonicalPageUrl, SearchResult(Document(DerivedStructData(googleResultLink)))) shouldBe true
+  }
 
-  private def resultWithLink(googleResultLink: String) = new Result().setLink(googleResultLink)
+  it should "generate reliable search terms" in {
+    val uri = URI.create("https://www.example.com/path/to/article")
+    val expectedTerm = "https://www.example.com/path/to/article \"/path/to/article\""
+    GoogleSearchService.reliableSearchTermFor(uri) shouldBe expectedTerm
+  }
+
+  it should "not match different paths on same domain" in {
+    val googleResultLink = "https://www.theguardian.com/food/different/path"
+    val canonicalPageUrl = URI.create("https://www.theguardian.com/food/original/path")
+    GoogleSearchService.resultMatches(canonicalPageUrl, SearchResult(Document(DerivedStructData(googleResultLink)))) shouldBe false
+  }
 }

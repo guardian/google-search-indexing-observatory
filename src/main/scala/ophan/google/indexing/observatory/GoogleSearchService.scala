@@ -28,7 +28,7 @@ object SearchResult {
   implicit val rw: ReadWriter[SearchResult] = macroRW
 }
 
-case class SearchResponse(results: List[SearchResult])
+case class SearchResponse(results: List[SearchResult] = List.empty)
 
 object SearchResponse {
   implicit val rw: ReadWriter[SearchResponse] = macroRW
