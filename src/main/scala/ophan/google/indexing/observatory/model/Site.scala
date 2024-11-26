@@ -2,7 +2,6 @@ package ophan.google.indexing.observatory.model
 
 import java.net.URI
 
-// Note, the datastore ID is only used but a connected app is still necessary for this to work
 case class Site(url: String, datastoreId: String, sitemaps: Set[URI])
 
 object Sites {
