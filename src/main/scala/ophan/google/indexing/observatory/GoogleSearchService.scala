@@ -54,7 +54,6 @@ class GoogleSearchService(
       val request = HttpRequest.newBuilder()
         .uri(URI.create(s"$baseUrl?key=$apiKey"))
         .header("Content-Type", "application/json")
-        .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
         .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
         .build()
 
