@@ -2,7 +2,7 @@ package ophan.google.indexing.observatory
 
 import upickle.default.*
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{CheckReport, Site}
+import ophan.google.indexing.observatory.model.{CheckReport, PathOnly, Site, UrlAndQuotedPath, UrlOnly}
 
 import java.net.URI
 import java.net.http.{HttpClient, HttpRequest}
@@ -60,6 +60,7 @@ class GoogleSearchService(
       val attemptExecute = Try {
         val response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
         val searchResponse = read[SearchResponse](response.body())
+        println(s"searchResponse for $uri $searchResponse")
         searchResponse.results.exists(result => GoogleSearchService.resultMatches(uri, result))
       }
 
@@ -83,13 +84,9 @@ object GoogleSearchService {
    * the article would be one candidate for the value, but the headlines can
    * contain characters that are difficult to escape, eg quotes & double-quotes.
    *
-   * It seems most reliable to use BOTH the url AND the quoted-path of the url
-   * as the search term. When used by themselves, each term fails for some url:
-   *
-   * * URL-only: Fails to find
-   *   - https://www.nytimes.com/video/middle-east
-   *   - https://www.nytimes.com/interactive/2021/us/martin-indiana-covid-cases.html
-   * * Path-only: Fails to find https://www.theguardian.com/business/live/2022/oct/11/bank-of-england--bond-markets-gilts-uk-unemployment-ifs-spending-cuts-imf-outlook-business-live
+   * It seems most reliable to use the URL without the prefixed `https://www.` as the search term.
    */
-  def reliableSearchTermFor(uri: URI): String = s"${uri.toString} \"${uri.getPath}\""
+  def reliableSearchTermFor(uri: URI): String = {
+    uri.toString.replace("https://www.", "")
+  }
 }
