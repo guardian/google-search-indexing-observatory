@@ -22,7 +22,7 @@ class GoogleSearchServiceTest extends AnyFlatSpec with Matchers {
 
   it should "generate reliable search terms" in {
     val uri = URI.create("https://www.example.com/path/to/article")
-    val expectedTerm = "https://www.example.com/path/to/article \"/path/to/article\""
+    val expectedTerm = "example.com/path/to/article"
     GoogleSearchService.reliableSearchTermFor(uri) shouldBe expectedTerm
   }
 
