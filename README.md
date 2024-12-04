@@ -14,12 +14,18 @@ and collating observations of distant sites and processes that are visible to us
 ## Steps performed by the Observatory
 
 1. Fetch the Sitemap XML for a news site
-2. Hit the [Google Custom Search Site Restricted JSON API](https://developers.google.com/custom-search/v1/site_restricted_api)
+2. Hit the [Discovery Engine API (service is named Google Vertex Agent Builder)](https://cloud.google.com/generative-ai-app-builder/docs/reference/rest)
    to check if the content listed is available in Google search.
-   [API Consumption](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/metrics?project=ophan-reborn-2017) &
+   [API Consumption](https://console.cloud.google.com/gen-app-builder/monitoring?inv=1&invt=AbigZA&project=ophan-reborn-2017) &
    [Cost 💰💰💰](https://console.cloud.google.com/apis/api/customsearch.googleapis.com/cost?project=ophan-reborn-2017)
    for this can be monitored in the Google Cloud console.
 3. Stores whether each article is available (or not) in an AWS DynamoDb table.
+
+## Vertex Agent Builder
+
+When setting up search functionality in the GCP Agent Builder, we need to create both an app and a dataStore in the Agent Builder for each website we want to search (in this case BBC, DailyMail, and NYT).
+While GCP's interface suggests this process creates a new search engine with its own database, this isn't actually what happens. Instead, it creates a filtered view of Google Search results, limited to the specific website URL we specify.
+_Note:_ Even though our code doesn't directly reference the App ID, you must still create both the app and the dataStore for each website - creating just the dataStore isn't sufficient and leads to API errors.
 
 ## Running the Checker locally
 
