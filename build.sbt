@@ -25,13 +25,14 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.5.0",
   "com.lihaoyi" %% "upickle" % "3.2.0",
   "com.squareup.okhttp3" % "okhttp" % "4.12.0",
-
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "org.scanamo" %% "scanamo" % "1.0.0-M30",
   "org.scalatest" %% "scalatest" % "3.2.18" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
+  "com.google.http-client" % "google-http-client-gson" % "1.44.1",
+  "com.google.apis" % "google-api-services-customsearch" % "v1-rev20240103-2.0.0",
   "com.bnsal" % "sitemap-parser" % "1.0.3",
   "org.typelevel" %% "literally" % "1.1.0" % Test,
 

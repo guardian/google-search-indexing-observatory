@@ -1,31 +1,18 @@
 package ophan.google.indexing.observatory
 
+import cats.data.EitherT
+import cats.implicits.*
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent
-import Credentials.fetchKeyFromParameterStore
+import com.gu.http.redirect.resolver.UrlResolver
+import ophan.google.indexing.observatory.Credentials.fetchKeyFromParameterStore
+import ophan.google.indexing.observatory.logging.Logging
+import ophan.google.indexing.observatory.model.Sites
 
-import java.time.Clock
-import java.time.Clock.systemUTC
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
-import com.madgag.scala.collection.decorators.*
-import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{AvailabilityRecord, Site, Sites}
-
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpClient.Redirect
-import java.net.http.HttpClient.Version.HTTP_2
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse.BodyHandlers
-import java.time.Duration.ofSeconds
-import scala.jdk.FutureConverters.*
-import cats.data.EitherT
-import cats.implicits.*
-import com.gu.http.redirect.resolver.UrlResolver
-
-import scala.util.{Failure, Success}
+import scala.util.Success
 
 
 object Lambda extends Logging {
