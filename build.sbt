@@ -30,7 +30,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.18" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
-
   "com.google.http-client" % "google-http-client-gson" % "1.44.1",
   "com.google.apis" % "google-api-services-customsearch" % "v1-rev20240103-2.0.0",
   "com.bnsal" % "sitemap-parser" % "1.0.3",

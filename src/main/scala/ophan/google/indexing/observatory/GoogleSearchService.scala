@@ -1,8 +1,8 @@
 package ophan.google.indexing.observatory
 
-import upickle.default.*
 import ophan.google.indexing.observatory.logging.Logging
-import ophan.google.indexing.observatory.model.{CheckReport, PathOnly, Site, UrlAndQuotedPath, UrlOnly}
+import ophan.google.indexing.observatory.model.{CheckReport, Site}
+import upickle.default.*
 
 import java.net.URI
 import java.net.http.{HttpClient, HttpRequest}

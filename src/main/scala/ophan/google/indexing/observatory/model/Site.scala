@@ -8,11 +8,6 @@ case class Site(
                  sitemaps: Set[URI],
                )
 
-sealed trait SearchStrategy
-case object UrlOnly extends SearchStrategy
-case object PathOnly extends SearchStrategy
-case object UrlAndQuotedPath extends SearchStrategy
-
 object Sites {
   val NewYorkTimes = Site(
     url="https://www.nytimes.com/",
