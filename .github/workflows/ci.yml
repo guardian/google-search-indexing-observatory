@@ -20,12 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 11
-          cache: sbt
+      - name: Setup Scala
+        uses: guardian/setup-scala@v1
       - name: CDK
         run: |
           (
