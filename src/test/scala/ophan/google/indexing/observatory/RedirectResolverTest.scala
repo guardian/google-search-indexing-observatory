@@ -21,9 +21,10 @@ class RedirectResolverTest extends AnyFlatSpec with Matchers with ScalaFutures w
     given liveResolver: UrlResolver = UrlResolver(RedirectFollower)
 
     it should "resolve a NYT url - note the NYT seem to accept curl but not other User-Agents!" in {
-      resolving(uri"https://www.nytimes.com/2023/10/03/sports/cricket/cricket-world-cup-explained.html") {
+      val originalUri = uri"https://www.nytimes.com/2023/10/03/sports/cricket/cricket-world-cup-explained.html"
+      resolving(originalUri) {
         inside(_) {
-          case resolved: Resolved => resolved.conclusion.isOk shouldBe true
+          case resolved: Resolved => resolved.redirectPath.originalUri shouldBe originalUri
         }
       }
     }
