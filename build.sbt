@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "literally" % "1.1.0" % Test,
 
   "com.github.blemale" %% "scaffeine" % "5.2.1",
-  "com.gu" %% "redirect-resolver" % "0.0.35"
+  "com.gu" %% "redirect-resolver" % "0.0.51-PREVIEW.updatenonaws.2025-08-05T1432.9e2e8e88"
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.25.28")
 
