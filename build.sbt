@@ -39,7 +39,7 @@ libraryDependencies ++= Seq(
   "com.gu" %% "redirect-resolver" % "0.0.35",
   "io.netty" % "netty-handler" % "4.1.124.Final"
 
-) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.16")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.27")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
