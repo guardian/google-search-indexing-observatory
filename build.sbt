@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
   "com.bnsal" % "sitemap-parser" % "1.0.3",
-  "org.typelevel" %% "literally" % "1.1.0" % Test,
+  "org.typelevel" %% "literally" % "1.2.0" % Test,
 
   "com.github.blemale" %% "scaffeine" % "5.2.1",
   "com.gu" %% "redirect-resolver" % "0.0.51",
