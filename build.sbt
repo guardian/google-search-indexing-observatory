@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "com.bnsal" % "sitemap-parser" % "1.0.3",
   "org.typelevel" %% "literally" % "1.1.0" % Test,
 
-  "com.github.blemale" %% "scaffeine" % "5.2.1",
+  "com.github.blemale" %% "scaffeine" % "5.3.0",
   "com.gu" %% "redirect-resolver" % "0.0.51",
   "io.netty" % "netty-handler" % "4.1.124.Final"
 
