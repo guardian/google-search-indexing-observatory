@@ -20,7 +20,7 @@ val catsVersion = "2.10.0"
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.4.0",
   "com.amazonaws" % "aws-lambda-java-events" % "3.16.1",
-  "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
+  "net.logstash.logback" % "logstash-logback-encoder" % "9.0",
   "org.slf4j" % "log4j-over-slf4j" % "2.0.12", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
   "ch.qos.logback" % "logback-classic" % "1.5.0",
   "com.lihaoyi" %% "upickle" % "3.2.0",
