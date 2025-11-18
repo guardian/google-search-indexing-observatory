@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "com.squareup.okhttp3" % "okhttp" % "4.12.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
-  "org.scanamo" %% "scanamo" % "4.0.0",
+  "org.scanamo" %% "scanamo" % "5.0.0",
   "org.scalatest" %% "scalatest" % "3.2.18" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
