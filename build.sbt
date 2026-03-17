@@ -9,6 +9,7 @@ description:= "Checking how long it takes content published by news organisation
 version := "1.0"
 
 scalaVersion := "3.3.1"
+val jacksonVersion = "2.18.6"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -40,6 +41,12 @@ libraryDependencies ++= Seq(
   "io.netty" % "netty-handler" % "4.1.124.Final"
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.33")
+
+dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
+)
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
