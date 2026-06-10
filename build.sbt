@@ -41,7 +41,7 @@ libraryDependencies ++= Seq(
 
   "com.github.blemale" %% "scaffeine" % "5.2.1",
   "com.gu" %% "redirect-resolver" % "0.0.51",
-  "io.netty" % "netty-handler" % "4.1.124.Final"
+  "io.netty" % "netty-handler" % "4.1.135.Final"
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.33")
 
