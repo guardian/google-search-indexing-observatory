@@ -8,7 +8,7 @@ description:= "Checking how long it takes content published by news organisation
 
 version := "1.0"
 
-scalaVersion := "3.3.1"
+scalaVersion := "3.3.8"
 val jacksonVersion = "2.18.9"
 val nettyVersion = "4.2.16.Final"
 
@@ -23,8 +23,8 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.4.0",
   "com.amazonaws" % "aws-lambda-java-events" % "3.16.1",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
-  "org.slf4j" % "log4j-over-slf4j" % "2.0.12", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
-  "ch.qos.logback" % "logback-classic" % "1.5.0",
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.18", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
+  "ch.qos.logback" % "logback-classic" % "1.5.37",
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
   "org.scanamo" %% "scanamo" % "4.0.0",
-  "org.scalatest" %% "scalatest" % "3.2.18" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.20" % Test,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
 
