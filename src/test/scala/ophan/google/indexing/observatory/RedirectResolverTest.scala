@@ -30,9 +30,10 @@ class RedirectResolverTest extends AnyFlatSpec with Matchers with ScalaFutures w
     }
 
     it should "resolve a Daily Mail url" in {
-      resolving(uri"https://www.dailymail.co.uk/news/article-12589205/Well-supporting-Ukraine-Biden-tells-allies-President-calls-global-partners-assure-U-S-giving-Zelensky-cash-despite-chaos-Congress-pro-Kremlin-candidate-storming-power-Slovakia.html") {
+      val originalUri = uri"https://www.dailymail.com/news/us-politics/article-12589205/Well-supporting-Ukraine-Biden-tells-allies-President-calls-global-partners-assure-U-S-giving-Zelensky-cash-despite-chaos-Congress-pro-Kremlin-candidate-storming-power-Slovakia.html"
+      resolving(originalUri) {
         inside(_) {
-          case resolved: Resolved => resolved.conclusion.isOk shouldBe true
+          case resolved: Resolved => resolved.redirectPath.originalUri shouldBe originalUri
         }
       }
     }
