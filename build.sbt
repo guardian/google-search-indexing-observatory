@@ -9,7 +9,8 @@ description:= "Checking how long it takes content published by news organisation
 version := "1.0"
 
 scalaVersion := "3.3.1"
-val jacksonVersion = "2.18.6"
+val jacksonVersion = "2.18.9"
+val nettyVersion = "4.2.16.Final"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -41,7 +42,10 @@ libraryDependencies ++= Seq(
 
   "com.github.blemale" %% "scaffeine" % "5.2.1",
   "com.gu" %% "redirect-resolver" % "0.0.51",
-  "io.netty" % "netty-handler" % "4.1.124.Final"
+  "io.netty" % "netty-handler" % nettyVersion,
+  "io.netty" % "netty-codec" % nettyVersion,
+  "io.netty" % "netty-codec-http" % nettyVersion,
+  "io.netty" % "netty-codec-http2" % nettyVersion
 
 ) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.33")
 
