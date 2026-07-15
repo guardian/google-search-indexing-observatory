@@ -9,7 +9,7 @@ description:= "Checking how long it takes content published by news organisation
 version := "1.0"
 
 scalaVersion := "3.3.1"
-val jacksonVersion = "2.18.9"
+val jacksonVersion = "2.22"
 val nettyVersion = "4.2.16.Final"
 
 scalacOptions ++= Seq(
