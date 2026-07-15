@@ -41,7 +41,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "literally" % "1.1.0" % Test,
 
   "com.github.blemale" %% "scaffeine" % "5.2.1",
-  "com.gu" %% "redirect-resolver" % "0.0.51",
+  "com.gu" %% "redirect-resolver" % "0.0.53",
   "io.netty" % "netty-handler" % nettyVersion,
   "io.netty" % "netty-codec" % nettyVersion,
   "io.netty" % "netty-codec-http" % nettyVersion,
