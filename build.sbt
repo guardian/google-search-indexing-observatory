@@ -47,7 +47,7 @@ libraryDependencies ++= Seq(
   "io.netty" % "netty-codec-http" % nettyVersion,
   "io.netty" % "netty-codec-http2" % nettyVersion
 
-) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.32.33")
+) ++ Seq("ssm", "url-connection-client").map(artifact => "software.amazon.awssdk" % artifact % "2.35.8")
 
 Test / testOptions +=
   Tests.Argument(TestFrameworks.ScalaTest, "-u", s"test-results/scala-${scalaVersion.value}", "-o")
