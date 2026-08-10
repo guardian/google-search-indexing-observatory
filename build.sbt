@@ -17,7 +17,7 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 
-val catsVersion = "2.10.0"
+val catsVersion = "2.13.0"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.4.0",
