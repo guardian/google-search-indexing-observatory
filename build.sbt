@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.4.0",
   "com.amazonaws" % "aws-lambda-java-events" % "3.16.1",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.4",
-  "org.slf4j" % "log4j-over-slf4j" % "2.0.12", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
+  "org.slf4j" % "log4j-over-slf4j" % "2.0.17", //  log4j-over-slf4j provides `org.apache.log4j.MDC`, which is dynamically loaded by the Lambda runtime
   "ch.qos.logback" % "logback-classic" % "1.5.0",
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
