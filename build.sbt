@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
-  "com.lihaoyi" %% "upickle" % "3.2.0",
+  "com.lihaoyi" %% "upickle" % "3.3.1",
   "com.squareup.okhttp3" % "okhttp" % "4.12.0",
 
   "com.madgag" %% "scala-collection-plus" % "0.11",
