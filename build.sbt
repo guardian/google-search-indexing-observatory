@@ -11,7 +11,7 @@ version := "1.0"
 scalaVersion := "3.3.1"
 val jacksonVersion = "2.22.3"
 val jacksonAnnotationVersion = "2.22"
-val nettyVersion = "4.2.17.Final"
+val nettyVersion = "4.2.18.Final"
 
 scalacOptions ++= Seq(
   "-deprecation",
