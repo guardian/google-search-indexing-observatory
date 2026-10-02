@@ -8,7 +8,7 @@ description:= "Checking how long it takes content published by news organisation
 
 version := "1.0"
 
-scalaVersion := "3.3.1"
+scalaVersion := "3.3.8"
 val jacksonVersion = "2.22.3"
 val jacksonAnnotationVersion = "2.22"
 val nettyVersion = "4.2.17.Final"
